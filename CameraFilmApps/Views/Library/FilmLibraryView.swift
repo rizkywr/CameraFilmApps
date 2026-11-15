@@ -40,6 +40,7 @@ struct FilmLibraryView: View {
                     }
                 }
             }
+            .environment(\.editMode, $editMode)
             .navigationTitle("FILM VAULT")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, isPresented: $isSearchPresented, prompt: "Search Kodak, Fuji, Ilford…")
@@ -71,9 +72,15 @@ struct FilmLibraryView: View {
                                     editMode = (editMode == .active) ? .inactive : .active
                                 }
                             } label: {
-                                Text(editMode == .active ? "CLOSE" : "EDIT")
-                                    .font(.system(size: 12, weight: .heavy))
-                                    .foregroundStyle(Color.white)
+                                if editMode == .active {
+                                    Text("CLOSE")
+                                        .font(.system(size: 12, weight: .heavy))
+                                        .foregroundStyle(Color.white)
+                                } else {
+                                    Text("EDIT")
+                                        .font(.system(size: 12, weight: .heavy))
+                                        .foregroundStyle(Color.filmPrimary)
+                                }
                             }
                         }
                     case .explore:
@@ -192,7 +199,11 @@ struct FilmLibraryView: View {
         return List {
             Section {
                 ForEach(films) { film in
-                    Button { select(film) } label: {
+                    Button {
+                        if editMode == .inactive {
+                            select(film)
+                        }
+                    } label: {
                         AnalogMyFilmRow(film: film, isSelected: camera.selectedFilmID == film.id)
                     }
                     .buttonStyle(.plain)
@@ -209,6 +220,7 @@ struct FilmLibraryView: View {
                     .foregroundStyle(Color(white: 0.5))
             }
         }
+        .environment(\.editMode, $editMode)
         .scrollContentBackground(.hidden)
         .overlay {
             if library.myFilms.isEmpty {
