@@ -20,12 +20,14 @@ struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var camera = CameraModel()
     @State private var library = FilmLibrary()
+    @State private var rollStore = FilmRollStore.shared
 
     var body: some Scene {
         WindowGroup {
             CameraScreen()
                 .environment(camera)
                 .environment(library)
+                .environment(rollStore)
         }
     }
 }

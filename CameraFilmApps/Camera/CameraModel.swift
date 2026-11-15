@@ -107,6 +107,7 @@ final class CameraModel {
 
     /// The film currently loaded into the renderer (`nil` = no film).
     private(set) var selectedFilmID: String? = UserDefaults.standard.string(forKey: Keys.selectedFilm)
+    private(set) var selectedFilmName: String? = nil
 
     var adjustments: FilmAdjustments = CameraModel.savedAdjustments() {
         didSet {
@@ -143,13 +144,21 @@ final class CameraModel {
         let renderer = renderer
         service.onFrame = { frame in renderer?.enqueue(frame: frame) }
         renderer?.setAdjustments(adjustments)
-        loadLatestPhotoFromLibrary()
+        if let rollThumb = FilmRollStore.shared.latestThumbnail {
+            self.lastPhoto = rollThumb
+        } else {
+            loadLatestPhotoFromLibrary()
+        }
     }
 
     func refreshLatestPhoto() {
-        Task { @MainActor in
-            if let photo = await PhotoWriter.fetchLatestPhotoThumbnail() {
-                self.lastPhoto = photo
+        if let rollThumb = FilmRollStore.shared.latestThumbnail {
+            self.lastPhoto = rollThumb
+        } else {
+            Task { @MainActor in
+                if let photo = await PhotoWriter.fetchLatestPhotoThumbnail() {
+                    self.lastPhoto = photo
+                }
             }
         }
     }
@@ -170,6 +179,7 @@ final class CameraModel {
     /// Loads a film's LUT into the renderer. Pass `nil` for no film.
     func selectFilm(_ film: Film?, lutURL: URL?) async {
         selectedFilmID = film?.id
+        selectedFilmName = film?.displayName
         UserDefaults.standard.set(film?.id, forKey: Keys.selectedFilm)
         guard let film, let lutURL else {
             renderer?.setLUT(nil)
@@ -358,7 +368,10 @@ final class CameraModel {
                 return (data, preview)
             }.value
             lastPhoto = preview
-            try await PhotoWriter.saveToLibrary(data)
+            let filmTitle = selectedFilmName ?? "Original"
+            if let preview {
+                await FilmRollStore.shared.addPhoto(data: data, thumbnail: preview, filmName: filmTitle)
+            }
         } catch {
             captureError = error.localizedDescription
         }

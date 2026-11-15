@@ -8,11 +8,13 @@ import SwiftUI
 struct CameraScreen: View {
     @Environment(CameraModel.self) private var camera
     @Environment(FilmLibrary.self) private var library
+    @Environment(FilmRollStore.self) private var rollStore
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
     @State private var showsLibrary = false
     @State private var showsAdjustments = false
+    @State private var isShowingRollReview = false
 
     var body: some View {
         ZStack {
@@ -45,6 +47,9 @@ struct CameraScreen: View {
         }
         .sheet(isPresented: $showsAdjustments) {
             AdjustmentsSheet()
+        }
+        .sheet(isPresented: $isShowingRollReview) {
+            FilmRollReviewView(skin: camera.cameraSkin)
         }
 
         .alert("Something Went Wrong", isPresented: errorBinding) {
@@ -147,42 +152,58 @@ struct CameraScreen: View {
 
             // Bottom Row: Gallery Thumbnail (Left) - Shutter Button (Center) - Vintage Zoom Rocker (Right)
             HStack(alignment: .center) {
-                // Left: Square Photo Record preview thumbnail (taps to open Photos)
+                // Left: Square Photo Record preview thumbnail (taps to open Film Roll Review)
                 Button {
-                    let generator = UIImpactFeedbackGenerator(style: .light)
+                    let generator = UIImpactFeedbackGenerator(style: .medium)
                     generator.impactOccurred()
-                    openURL(URL(string: "photos-redirect://")!)
+                    isShowingRollReview = true
                 } label: {
-                    Group {
-                        if let photo = camera.lastPhoto {
-                            Image(uiImage: photo)
-                                .resizable()
-                                .scaledToFill()
-                        } else {
-                            Color.filmSurfaceContainerHigh
-                                .overlay {
-                                    Image(systemName: "photo.on.rectangle")
-                                        .foregroundStyle(.secondary)
-                                }
+                    ZStack(alignment: .topTrailing) {
+                        Group {
+                            if let photo = rollStore.latestThumbnail ?? camera.lastPhoto {
+                                Image(uiImage: photo)
+                                    .resizable()
+                                    .scaledToFill()
+                            } else {
+                                Color.filmSurfaceContainerHigh
+                                    .overlay {
+                                        Image(systemName: "film.stack")
+                                            .font(.system(size: 20))
+                                            .foregroundStyle(.secondary)
+                                    }
+                            }
+                        }
+                        .frame(width: 54, height: 54)
+                        .clipShape(.rect(cornerRadius: 8))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [Color.white.opacity(0.6), Color.black.opacity(0.8)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                        )
+                        .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 2)
+
+                        // Frame counter badge (like dashcam / analog film counter)
+                        if !rollStore.photos.isEmpty {
+                            Text("\(rollStore.photos.count)")
+                                .font(.system(size: 10, weight: .black, design: .monospaced))
+                                .foregroundStyle(.black)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(Color.filmPrimary)
+                                .clipShape(Capsule())
+                                .offset(x: 5, y: -5)
+                                .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
                         }
                     }
-                    .frame(width: 54, height: 54)
-                    .clipShape(.rect(cornerRadius: 8))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .strokeBorder(
-                                LinearGradient(
-                                    colors: [Color.white.opacity(0.6), Color.black.opacity(0.8)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                    )
-                    .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 2)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Open Photos")
+                .accessibilityLabel("Review Film Roll")
 
                 Spacer()
 
