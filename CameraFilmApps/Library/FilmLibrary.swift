@@ -17,13 +17,8 @@ final class FilmLibrary {
     /// Films shipped inside the app so it works offline from the first launch.
     static let bundledIDs: [String] = [
         "luts/negative_new/kodak_portra_400.cube",
-        "luts/negative_color/kodak_ektar_100.cube",
         "luts/negative_old/fuji_superia_400.cube",
-        "luts/fujixtransiii/fuji_xtrans_iii_classic_chrome.cube",
-        "luts/colorslide/fuji_velvia_50.cube",
-        "luts/print/kodak_2383_cuspclip.cube",
         "luts/bw/kodak_tri-x_400.cube",
-        "luts/bw/ilford_hp_5_plus_400.cube",
     ]
 
     private(set) var films: [Film] = []
@@ -49,6 +44,24 @@ final class FilmLibrary {
     }
 
     init() {
+        let migrationKey = "FCDefaultFilmsV2"
+        if !UserDefaults.standard.bool(forKey: migrationKey) {
+            UserDefaults.standard.set(true, forKey: migrationKey)
+            let oldDefaultSet = Set([
+                "luts/negative_new/kodak_portra_400.cube",
+                "luts/negative_color/kodak_ektar_100.cube",
+                "luts/negative_old/fuji_superia_400.cube",
+                "luts/fujixtransiii/fuji_xtrans_iii_classic_chrome.cube",
+                "luts/colorslide/fuji_velvia_50.cube",
+                "luts/print/kodak_2383_cuspclip.cube",
+                "luts/bw/kodak_tri-x_400.cube",
+                "luts/bw/ilford_hp_5_plus_400.cube",
+            ])
+            let current = UserDefaults.standard.stringArray(forKey: Keys.myFilms)
+            if current == nil || (current != nil && Set(current!) == oldDefaultSet) {
+                UserDefaults.standard.set(Self.bundledIDs, forKey: Keys.myFilms)
+            }
+        }
         myFilmIDs = UserDefaults.standard.stringArray(forKey: Keys.myFilms) ?? Self.bundledIDs
         loadCachedCatalog()
     }
