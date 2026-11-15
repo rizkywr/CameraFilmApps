@@ -15,6 +15,7 @@ struct CameraScreen: View {
     @State private var showsLibrary = false
     @State private var showsAdjustments = false
     @State private var isShowingRollReview = false
+    @State private var isThumbnailPopping = false
 
     var body: some View {
         ZStack {
@@ -58,6 +59,18 @@ struct CameraScreen: View {
             Text(camera.captureError ?? library.errorMessage ?? "")
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.shutterCount)
+        .onChange(of: rollStore.photos.count) { oldCount, newCount in
+            guard newCount > oldCount else { return }
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.45)) {
+                isThumbnailPopping = true
+            }
+            Task {
+                try? await Task.sleep(for: .milliseconds(320))
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) {
+                    isThumbnailPopping = false
+                }
+            }
+        }
         .task {
             // If selectedFilmID is nil, default to Portra 400 from bundled films
             let filmID = camera.selectedFilmID ?? FilmLibrary.bundledIDs.first
@@ -158,7 +171,7 @@ struct CameraScreen: View {
                     generator.impactOccurred()
                     isShowingRollReview = true
                 } label: {
-                    ZStack(alignment: .topTrailing) {
+                    ZStack(alignment: .center) {
                         Group {
                             if let photo = rollStore.latestThumbnail ?? camera.lastPhoto {
                                 Image(uiImage: photo)
@@ -179,28 +192,23 @@ struct CameraScreen: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .strokeBorder(
                                     LinearGradient(
-                                        colors: [Color.white.opacity(0.6), Color.black.opacity(0.8)],
+                                        colors: isThumbnailPopping
+                                            ? [Color.filmPrimary, Color.white]
+                                            : [Color.white.opacity(0.6), Color.black.opacity(0.8)],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
                                     lineWidth: 2
                                 )
                         )
-                        .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 2)
-
-                        // Frame counter badge (like dashcam / analog film counter)
-                        if !rollStore.photos.isEmpty {
-                            Text("\(rollStore.photos.count)")
-                                .font(.system(size: 10, weight: .black, design: .monospaced))
-                                .foregroundStyle(.black)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(Color.filmPrimary)
-                                .clipShape(Capsule())
-                                .offset(x: 5, y: -5)
-                                .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
-                        }
+                        .shadow(
+                            color: isThumbnailPopping ? Color.filmPrimary.opacity(0.6) : Color.black.opacity(0.6),
+                            radius: isThumbnailPopping ? 6 : 3,
+                            x: 0,
+                            y: 2
+                        )
                     }
+                    .scaleEffect(isThumbnailPopping ? 1.22 : 1.0)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Review Film Roll")
