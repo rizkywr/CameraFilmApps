@@ -27,7 +27,16 @@ final class FilmRollStore: @unchecked Sendable {
         self.indexFileURL = storeDirectory.appending(path: "roll_index.json")
 
         try? fileManager.createDirectory(at: storeDirectory, withIntermediateDirectories: true)
-        try? fileManager.createDirectory(at: thumbsDirectory, withIntermediateDirectories: true)
+
+        // Clear legacy squished thumbnail cache so existing photos re-generate with precise 3:4 aspect ratio
+        let v2ThumbMarker = storeDirectory.appending(path: ".thumbs_v2")
+        if !fileManager.fileExists(atPath: v2ThumbMarker.path) {
+            try? fileManager.removeItem(at: thumbsDirectory)
+            try? fileManager.createDirectory(at: thumbsDirectory, withIntermediateDirectories: true)
+            fileManager.createFile(atPath: v2ThumbMarker.path, contents: nil)
+        } else {
+            try? fileManager.createDirectory(at: thumbsDirectory, withIntermediateDirectories: true)
+        }
 
         loadIndex()
         updateLatestThumbnail()
@@ -55,11 +64,11 @@ final class FilmRollStore: @unchecked Sendable {
             memoryCache.setObject(image, forKey: key)
             return image
         }
-        // Fallback: try loading full image and generate thumbnail
-        if let full = fullImage(for: photo),
-           let thumb = full.preparingThumbnail(of: CGSize(width: 320, height: 320)) {
+        // Fallback: load full image and generate thumbnail preserving exact aspect ratio
+        if let full = fullImage(for: photo) {
+            let thumb = full.makeThumbnail(maxPixelDimension: 600)
             memoryCache.setObject(thumb, forKey: key)
-            if let thumbData = thumb.jpegData(compressionQuality: 0.85) {
+            if let thumbData = thumb.jpegData(compressionQuality: 0.88) {
                 try? thumbData.write(to: url, options: .atomic)
             }
             return thumb
@@ -69,6 +78,10 @@ final class FilmRollStore: @unchecked Sendable {
 
     func fullImage(for photo: RollPhoto) -> UIImage? {
         let url = photoURL(for: photo)
+        if let data = try? Data(contentsOf: url),
+           let img = UIImage(data: data) {
+            return img
+        }
         return UIImage(contentsOfFile: url.path)
     }
 
@@ -89,11 +102,12 @@ final class FilmRollStore: @unchecked Sendable {
         // Save high-resolution photo file
         try? data.write(to: fullURL, options: .atomic)
 
-        // Save thumbnail file
-        if let thumbData = thumbnail.jpegData(compressionQuality: 0.85) {
+        // Ensure thumbnail is baked in upright orientation with preserved aspect ratio
+        let uprightThumb = thumbnail.makeThumbnail(maxPixelDimension: 600)
+        if let thumbData = uprightThumb.jpegData(compressionQuality: 0.88) {
             try? thumbData.write(to: thumbURL, options: .atomic)
         }
-        memoryCache.setObject(thumbnail, forKey: fileName as NSString)
+        memoryCache.setObject(uprightThumb, forKey: fileName as NSString)
 
         let newPhoto = RollPhoto(
             id: id,
@@ -105,7 +119,7 @@ final class FilmRollStore: @unchecked Sendable {
 
         await MainActor.run {
             self.photos.insert(newPhoto, at: 0)
-            self.latestThumbnail = thumbnail
+            self.latestThumbnail = uprightThumb
             self.saveIndex()
         }
 

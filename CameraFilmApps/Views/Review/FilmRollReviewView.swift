@@ -255,18 +255,16 @@ struct FilmRollReviewView: View {
 
         return ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
-                // Photo Thumbnail
-                ZStack {
+                // Photo Thumbnail with authentic 3:4 portrait aspect ratio (no squishing/gepeng)
+                ZStack(alignment: .topLeading) {
+                    Color.black
+
                     if let thumb = rollStore.thumbnail(for: photo) {
                         Image(uiImage: thumb)
                             .resizable()
                             .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 140)
-                            .clipped()
                     } else {
                         Color(white: 0.15)
-                            .frame(height: 140)
                             .overlay {
                                 ProgressView()
                                     .tint(Color.filmPrimary)
@@ -274,25 +272,21 @@ struct FilmRollReviewView: View {
                     }
 
                     // Vintage film stamp badge (top leading)
-                    VStack {
-                        HStack {
-                            Text(photo.filmName.uppercased())
-                                .font(.system(size: 8, weight: .black, design: .monospaced))
-                                .foregroundStyle(Color.filmPrimary)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(Color.black.opacity(0.8))
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .strokeBorder(Color.filmPrimary.opacity(0.5), lineWidth: 0.7)
-                                )
-                                .padding(6)
-                            Spacer()
-                        }
-                        Spacer()
-                    }
+                    Text(photo.filmName.uppercased())
+                        .font(.system(size: 8, weight: .black, design: .monospaced))
+                        .foregroundStyle(Color.filmPrimary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.black.opacity(0.8))
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .strokeBorder(Color.filmPrimary.opacity(0.5), lineWidth: 0.7)
+                        )
+                        .padding(8)
                 }
+                .aspectRatio(3 / 4, contentMode: .fit)
+                .clipped()
 
                 // Info Footer Strip on Card
                 HStack {

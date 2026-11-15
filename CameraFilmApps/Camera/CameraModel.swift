@@ -347,15 +347,13 @@ final class CameraModel {
                 guard let image = renderer.renderPhoto(photo.pixelBuffer) else { throw PhotoWriter.WriteError.encodingFailed }
                 let data = try PhotoWriter.encode(image, metadata: photo.metadata)
                 let orientation = PhotoWriter.orientation(from: photo.metadata)
-                let preview = UIImage(cgImage: image, scale: 1, orientation: orientation)
-                    .preparingThumbnail(of: CGSize(width: 240, height: 240 * CGFloat(image.width) / CGFloat(image.height)))
+                let fullUI = UIImage(cgImage: image, scale: 1, orientation: orientation)
+                let preview = fullUI.makeThumbnail(maxPixelDimension: 600)
                 return (data, preview)
             }.value
             lastPhoto = preview
             let filmTitle = selectedFilmName ?? "Original"
-            if let preview {
-                await FilmRollStore.shared.addPhoto(data: data, thumbnail: preview, filmName: filmTitle)
-            }
+            await FilmRollStore.shared.addPhoto(data: data, thumbnail: preview, filmName: filmTitle)
         } catch {
             captureError = error.localizedDescription
         }
@@ -391,8 +389,8 @@ final class CameraModel {
             guard let jpegData = processedUI.jpegData(compressionQuality: 0.95) else {
                 throw PhotoWriter.WriteError.encodingFailed
             }
-            let thumb = processedUI.preparingThumbnail(of: CGSize(width: 240, height: 240))
-            return (jpegData, thumb ?? processedUI)
+            let thumb = processedUI.makeThumbnail(maxPixelDimension: 600)
+            return (jpegData, thumb)
         }.value
 
         lastPhoto = preview
@@ -469,6 +467,28 @@ final class CameraModel {
 
 
 extension UIImage {
+    /// Generates a perfectly proportioned thumbnail baked into standard upright (.up) orientation.
+    func makeThumbnail(maxPixelDimension: CGFloat = 600) -> UIImage {
+        let currentWidth = size.width
+        let currentHeight = size.height
+        guard currentWidth > 0, currentHeight > 0 else { return self }
+        
+        let maxSide = max(currentWidth, currentHeight)
+        let scale = min(maxPixelDimension / maxSide, 1.0)
+        let targetSize = CGSize(
+            width: max(1, floor(currentWidth * scale)),
+            height: max(1, floor(currentHeight * scale))
+        )
+        
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1.0
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+        return renderer.image { _ in
+            self.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+    }
+
     /// Normalizes orientation to .up and bounds dimensions to fit within GPU texture limits
     fileprivate func normalizedForMetalProcessing(maxDimension: CGFloat = 3024) -> UIImage {
         let currentWidth = size.width
