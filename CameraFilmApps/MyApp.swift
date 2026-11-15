@@ -1,9 +1,31 @@
+//
+//  MyApp.swift
+//  CameraFilmApps
+//
+
 import SwiftUI
 
-@main struct MyApp: App {
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        supportedInterfaceOrientationsFor window: UIWindow?
+    ) -> UIInterfaceOrientationMask {
+        // Enforce strict portrait orientation regardless of device rotation
+        return .portrait
+    }
+}
+
+@main
+struct MyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @State private var camera = CameraModel()
+    @State private var library = FilmLibrary()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CameraScreen()
+                .environment(camera)
+                .environment(library)
         }
     }
 }

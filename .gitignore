@@ -1,0 +1,14 @@
+# Xcode
+#
+# gitignore contributors: paste this into .gitignore:
+# ___GITIGNORE___
+build/
+DerivedData/
+*.moved-aside
+*.xcuserstate
+xcuserdata/
+
+# Other
+*.DS_Store
+.Spotlight-V100
+.Trashes
