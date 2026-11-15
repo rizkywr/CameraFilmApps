@@ -110,25 +110,9 @@ struct RollPhotoDetailView: View {
 
     private var topBar: some View {
         HStack {
-            Button {
-                let generator = UIImpactFeedbackGenerator(style: .light)
-                generator.impactOccurred()
-                dismiss()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .bold))
-                    Text("Roll")
-                        .font(.system(size: 14, weight: .semibold))
-                }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.black.opacity(0.5))
-                .clipShape(Capsule())
-                .overlay(Capsule().strokeBorder(Color.white.opacity(0.2), lineWidth: 1))
-            }
-            .buttonStyle(.plain)
+            // Invisible balance spacer so title remains centered
+            Color.clear
+                .frame(width: 36, height: 36)
 
             Spacer()
 
@@ -144,21 +128,22 @@ struct RollPhotoDetailView: View {
 
             Spacer()
 
-            // Share Button
-            if let image {
-                ShareLink(item: Image(uiImage: image), preview: SharePreview(photo.filmName, image: Image(uiImage: image))) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(Color.black.opacity(0.5))
-                        .clipShape(Circle())
-                        .overlay(Circle().strokeBorder(Color.white.opacity(0.2), lineWidth: 1))
-                }
-                .buttonStyle(.plain)
-            } else {
-                Color.clear.frame(width: 36, height: 36)
+            // Close (X) Button
+            Button {
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(Color.black.opacity(0.55))
+                    .clipShape(Circle())
+                    .overlay(Circle().strokeBorder(Color.white.opacity(0.25), lineWidth: 1))
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Close")
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
