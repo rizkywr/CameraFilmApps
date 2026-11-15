@@ -23,6 +23,7 @@ struct FilmLibraryView: View {
     @State private var isSearchPresented = false
     @FocusState private var isSearchFocused: Bool
     @State private var confirmsDownloadAll = false
+    @State private var editMode: EditMode = .inactive
 
     var body: some View {
         NavigationStack {
@@ -64,8 +65,17 @@ struct FilmLibraryView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     switch scope {
                     case .myFilms:
-                        EditButton()
-                            .foregroundStyle(Color.filmPrimary)
+                        if !library.myFilms.isEmpty {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    editMode = (editMode == .active) ? .inactive : .active
+                                }
+                            } label: {
+                                Text(editMode == .active ? "CLOSE" : "EDIT")
+                                    .font(.system(size: 12, weight: .heavy))
+                                    .foregroundStyle(Color.white)
+                            }
+                        }
                     case .explore:
                         Button {
                             confirmsDownloadAll = true
@@ -98,6 +108,12 @@ struct FilmLibraryView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 8)
                 }
+            }
+        }
+        .environment(\.editMode, $editMode)
+        .onChange(of: scope) { _, newScope in
+            if newScope != .myFilms {
+                editMode = .inactive
             }
         }
     }
