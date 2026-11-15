@@ -31,13 +31,15 @@ struct FilmRollReviewView: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // 1. Top Analog Hardware Navigation Bar
+                    // Top Navigation Bar
                     headerBar
 
-                    // 2. Dashcam-style Subheader: Displays "Select All" when in multi-select mode, or helper text
-                    subHeaderBar
+                    // Subheader Bar (Select All option when in Selection Mode)
+                    if isSelectionMode && !rollStore.photos.isEmpty {
+                        selectionSubHeaderBar
+                    }
 
-                    // 3. Main Content: Photo Grid or Empty State
+                    // Main Content: Photo Grid or Empty State
                     if rollStore.photos.isEmpty {
                         emptyRollView
                     } else {
@@ -48,14 +50,14 @@ struct FilmRollReviewView: View {
                                 }
                             }
                             .padding(.horizontal, 16)
-                            .padding(.top, 10)
-                            .padding(.bottom, selectedIDs.isEmpty ? 40 : 120)
+                            .padding(.top, 12)
+                            .padding(.bottom, isSelectionMode ? 120 : 36)
                         }
                     }
                 }
 
-                // 4. Floating Action Bar: ONLY appears when a frame is clicked or held!
-                if !selectedIDs.isEmpty {
+                // Bottom Floating Action Bar (Visible only when in Selection Mode)
+                if isSelectionMode && !rollStore.photos.isEmpty {
                     VStack {
                         Spacer()
                         bottomActionBar
@@ -63,7 +65,7 @@ struct FilmRollReviewView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
 
-                // 5. Toast notification
+                // Toast notification
                 if let toastMessage {
                     VStack {
                         Spacer()
@@ -80,7 +82,7 @@ struct FilmRollReviewView: View {
                         .clipShape(Capsule())
                         .overlay(Capsule().strokeBorder(Color.filmPrimary.opacity(0.7), lineWidth: 1))
                         .shadow(color: .black.opacity(0.6), radius: 10, y: 5)
-                        .padding(.bottom, selectedIDs.isEmpty ? 40 : 100)
+                        .padding(.bottom, isSelectionMode ? 100 : 40)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
@@ -110,7 +112,9 @@ struct FilmRollReviewView: View {
                             rollStore.delete(ids: selectedIDs)
                         }
                         selectedIDs.removeAll()
-                        isSelectionMode = false
+                        if rollStore.photos.isEmpty {
+                            isSelectionMode = false
+                        }
                     }
                 }
                 Button("Cancel", role: .cancel) {}
@@ -122,7 +126,7 @@ struct FilmRollReviewView: View {
         }
     }
 
-    // MARK: - Top Header Bar
+    // MARK: - Header Bar
 
     private var headerBar: some View {
         HStack(alignment: .center) {
@@ -149,20 +153,20 @@ struct FilmRollReviewView: View {
 
             Spacer()
 
-            // Vintage Center Title
+            // Center Title
             VStack(spacing: 2) {
                 Text("FILM ROLL REVIEW")
                     .font(.system(size: 13, weight: .black, design: .monospaced))
                     .foregroundStyle(Color.filmPrimary)
 
-                Text("ROLL #01 • \(rollStore.photos.count) FRAMES")
+                Text(isSelectionMode ? "\(selectedIDs.count) OF \(rollStore.photos.count) SELECTED" : "ROLL #01 • \(rollStore.photos.count) FRAMES")
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .foregroundStyle(Color(white: 0.65))
             }
 
             Spacer()
 
-            // Mode Toggle: Done / Cancel if in multi-select, or subtle Select button
+            // Top Right: "Select" / "Done" Button (Daz Cam Style)
             if !rollStore.photos.isEmpty {
                 Button {
                     let generator = UIImpactFeedbackGenerator(style: .medium)
@@ -176,12 +180,21 @@ struct FilmRollReviewView: View {
                 } label: {
                     Text(isSelectionMode ? "Done" : "Select")
                         .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(isSelectionMode ? Color.filmPrimary : Color(white: 0.8))
-                        .padding(.horizontal, 12)
+                        .foregroundStyle(isSelectionMode ? Color(white: 0.9) : Color.filmPrimary)
+                        .padding(.horizontal, 14)
                         .padding(.vertical, 8)
-                        .background(Color.black.opacity(0.55))
+                        .background(
+                            isSelectionMode
+                            ? Color.black.opacity(0.6)
+                            : Color.black.opacity(0.7)
+                        )
                         .clipShape(Capsule())
-                        .overlay(Capsule().strokeBorder(Color.white.opacity(0.2), lineWidth: 1))
+                        .overlay(
+                            Capsule().strokeBorder(
+                                isSelectionMode ? Color.white.opacity(0.3) : Color.filmPrimary.opacity(0.8),
+                                lineWidth: 1.2
+                            )
+                        )
                 }
                 .buttonStyle(.plain)
             } else {
@@ -190,78 +203,53 @@ struct FilmRollReviewView: View {
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
-        .padding(.bottom, 8)
+        .padding(.bottom, 10)
         .background(Color.black.opacity(0.3))
     }
 
-    // MARK: - Subheader Bar (Select All Option on Hold)
+    // MARK: - Subheader Bar (Visible only when Select is active)
 
-    private var subHeaderBar: some View {
+    private var selectionSubHeaderBar: some View {
         HStack {
-            if isSelectionMode {
-                // "Select All" Option appears when user holds a frame or taps Select
-                let allSelected = selectedIDs.count == rollStore.photos.count && !rollStore.photos.isEmpty
-                Button {
-                    let generator = UIImpactFeedbackGenerator(style: .medium)
-                    generator.impactOccurred()
-                    withAnimation(.spring(duration: 0.2)) {
-                        if allSelected {
-                            selectedIDs.removeAll()
-                        } else {
-                            selectedIDs = Set(rollStore.photos.map(\.id))
-                        }
+            let allSelected = selectedIDs.count == rollStore.photos.count && !rollStore.photos.isEmpty
+            Button {
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+                withAnimation(.spring(duration: 0.2)) {
+                    if allSelected {
+                        selectedIDs.removeAll()
+                    } else {
+                        selectedIDs = Set(rollStore.photos.map(\.id))
                     }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: allSelected ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(Color.filmPrimary)
-                        Text(allSelected ? "Deselect All" : "Select All (\(rollStore.photos.count))")
-                            .font(.system(size: 12, weight: .black, design: .monospaced))
-                            .foregroundStyle(.white)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.black.opacity(0.55))
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule().strokeBorder(Color.filmPrimary.opacity(0.6), lineWidth: 1)
-                    )
                 }
-                .buttonStyle(.plain)
-
-                Spacer()
-
-                Text("\(selectedIDs.count) selected")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color.filmPrimary)
-            } else {
+            } label: {
                 HStack(spacing: 6) {
-                    Image(systemName: "hand.tap")
-                        .font(.system(size: 11))
+                    Image(systemName: allSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Color.filmPrimary)
-                    Text("Tap frame to Save • Hold to Select All")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Color(white: 0.65))
+                    Text(allSelected ? "Deselect All" : "Select All (\(rollStore.photos.count))")
+                        .font(.system(size: 12, weight: .black, design: .monospaced))
+                        .foregroundStyle(.white)
                 }
-
-                Spacer()
-
-                let savedCount = rollStore.photos.filter(\.isSavedToPhotos).count
-                if savedCount > 0 {
-                    Text("\(savedCount) saved")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color.green.opacity(0.9))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.green.opacity(0.15))
-                        .clipShape(Capsule())
-                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.black.opacity(0.6))
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule().strokeBorder(Color.filmPrimary.opacity(0.6), lineWidth: 1)
+                )
             }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Text("\(selectedIDs.count) selected")
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .foregroundStyle(Color.filmPrimary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-        .background(Color.black.opacity(0.2))
+        .background(Color.black.opacity(0.25))
     }
 
     // MARK: - Photo Card
@@ -308,27 +296,6 @@ struct FilmRollReviewView: View {
                         }
                         Spacer()
                     }
-
-                    // Double-tap hint / Preview eye on hover or single tap
-                    if isSelected && !isSelectionMode {
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                Button {
-                                    activeDetailPhoto = photo
-                                } label: {
-                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                        .font(.system(size: 11, weight: .bold))
-                                        .foregroundStyle(.white)
-                                        .padding(6)
-                                        .background(Color.black.opacity(0.75))
-                                        .clipShape(Circle())
-                                }
-                                .padding(6)
-                            }
-                        }
-                    }
                 }
 
                 // Info Footer Strip on Card
@@ -357,35 +324,31 @@ struct FilmRollReviewView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(
-                        isSelected ? Color.filmPrimary : Color.white.opacity(0.18),
-                        lineWidth: isSelected ? 2.5 : 1
+                        (isSelectionMode && isSelected) ? Color.filmPrimary : Color.white.opacity(0.18),
+                        lineWidth: (isSelectionMode && isSelected) ? 2.5 : 1
                     )
             )
-            .shadow(color: isSelected ? Color.filmPrimary.opacity(0.3) : .black.opacity(0.5), radius: 5, y: 3)
+            .shadow(color: (isSelectionMode && isSelected) ? Color.filmPrimary.opacity(0.3) : .black.opacity(0.5), radius: 5, y: 3)
             .contentShape(.rect)
             .onTapGesture {
-                // SINGLE CLICK: Selects this frame, bringing up the Save / Delete option!
                 let generator = UIImpactFeedbackGenerator(style: .light)
                 generator.impactOccurred()
-                withAnimation(.spring(duration: 0.2)) {
-                    if isSelectionMode {
+                if isSelectionMode {
+                    // Selection Mode: toggle this photo
+                    withAnimation(.spring(duration: 0.2)) {
                         if isSelected {
                             selectedIDs.remove(photo.id)
                         } else {
                             selectedIDs.insert(photo.id)
                         }
-                    } else {
-                        // In single tap mode: toggle this frame selection
-                        if isSelected {
-                            selectedIDs.remove(photo.id)
-                        } else {
-                            selectedIDs = [photo.id]
-                        }
                     }
+                } else {
+                    // Normal Mode (Daz Cam): Tap directly opens FULL VIEW!
+                    activeDetailPhoto = photo
                 }
             }
             .onLongPressGesture(minimumDuration: 0.3) {
-                // HOLD / LONG PRESS: Activates multi-selection mode and reveals "Select All" option!
+                // Hold enters Selection Mode and selects this photo
                 let generator = UIImpactFeedbackGenerator(style: .medium)
                 generator.impactOccurred()
                 withAnimation(.spring(duration: 0.25)) {
@@ -394,7 +357,7 @@ struct FilmRollReviewView: View {
                 }
             }
 
-            // Selection Checkbox Badge (visible when multi-select is active)
+            // Selection Checkbox Badge (visible when Select mode is active)
             if isSelectionMode {
                 ZStack {
                     Circle()
@@ -438,7 +401,7 @@ struct FilmRollReviewView: View {
                 .font(.system(size: 15, weight: .black, design: .monospaced))
                 .foregroundStyle(.white)
 
-            Text("Photos taken with the camera are held here on your virtual film roll so you can review, select, and save only your best shots.")
+            Text("Photos taken with the camera will appear here on your film roll.")
                 .font(.system(size: 13))
                 .foregroundStyle(Color(white: 0.65))
                 .multilineTextAlignment(.center)
@@ -448,18 +411,18 @@ struct FilmRollReviewView: View {
         }
     }
 
-    // MARK: - Dynamic Bottom Action Bar (Appears when frames are selected!)
+    // MARK: - Bottom Action Bar (Daz Cam Style: Delete & Save for Selected)
 
     private var bottomActionBar: some View {
         let count = selectedIDs.count
-        let isSingle = count == 1
+        let hasSelection = count > 0
         let isAll = count == rollStore.photos.count && count > 1
         let targetPhotos = rollStore.photos.filter { selectedIDs.contains($0.id) }
-        let singlePhoto = isSingle ? targetPhotos.first : nil
 
-        return HStack(spacing: 12) {
+        return HStack(spacing: 14) {
             // 1. DELETE BUTTON (Red Hardware Style)
             Button {
+                guard hasSelection else { return }
                 let generator = UIImpactFeedbackGenerator(style: .medium)
                 generator.impactOccurred()
                 showDeleteConfirmation = true
@@ -467,51 +430,33 @@ struct FilmRollReviewView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 13, weight: .bold))
-                    Text(isAll ? "Delete All" : (isSingle ? "Delete" : "Delete (\(count))"))
+                    Text(isAll ? "Delete All (\(count))" : (hasSelection ? "Delete (\(count))" : "Delete"))
                         .font(.system(size: 13, weight: .bold))
                 }
-                .foregroundStyle(Color(red: 0.95, green: 0.35, blue: 0.35))
-                .padding(.horizontal, 16)
+                .foregroundStyle(hasSelection ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color.white.opacity(0.3))
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(Color(red: 0.28, green: 0.08, blue: 0.08).opacity(0.92))
+                .background(
+                    hasSelection
+                    ? Color(red: 0.28, green: 0.08, blue: 0.08).opacity(0.92)
+                    : Color.black.opacity(0.5)
+                )
                 .clipShape(RoundedRectangle(cornerRadius: 14))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color(red: 0.85, green: 0.25, blue: 0.25).opacity(0.6), lineWidth: 1)
+                        .strokeBorder(
+                            hasSelection ? Color(red: 0.85, green: 0.25, blue: 0.25).opacity(0.6) : Color.white.opacity(0.1),
+                            lineWidth: 1
+                        )
                 )
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
             .buttonStyle(.plain)
+            .disabled(!hasSelection)
 
-            // 2. PREVIEW BUTTON (Only when 1 photo is clicked/selected)
-            if let singlePhoto {
-                Button {
-                    let generator = UIImpactFeedbackGenerator(style: .light)
-                    generator.impactOccurred()
-                    activeDetailPhoto = singlePhoto
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "eye.fill")
-                            .font(.system(size: 13, weight: .bold))
-                        Text("View")
-                            .font(.system(size: 13, weight: .bold))
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 14)
-                    .background(Color.black.opacity(0.65))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.25), lineWidth: 1)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-
-            // 3. SAVE BUTTON (Amber Hardware Style)
+            // 2. SAVE BUTTON (Amber Hardware Style)
             Button {
-                guard !isSavingBatch else { return }
+                guard hasSelection, !isSavingBatch else { return }
                 Task {
                     isSavingBatch = true
                     let generator = UIImpactFeedbackGenerator(style: .medium)
@@ -519,11 +464,7 @@ struct FilmRollReviewView: View {
                     do {
                         let saved = try await rollStore.saveToSystemPhotos(photos: targetPhotos)
                         withAnimation {
-                            if isSingle {
-                                toastMessage = "SAVED TO GALLERY"
-                            } else {
-                                toastMessage = "\(saved) PHOTO\(saved > 1 ? "S" : "") SAVED TO GALLERY"
-                            }
+                            toastMessage = "\(saved) PHOTO\(saved > 1 ? "S" : "") SAVED TO GALLERY"
                         }
                         let successGen = UINotificationFeedbackGenerator()
                         successGen.notificationOccurred(.success)
@@ -545,19 +486,24 @@ struct FilmRollReviewView: View {
                         Text("Saving...")
                             .font(.system(size: 13, weight: .bold))
                     } else {
-                        Image(systemName: (singlePhoto?.isSavedToPhotos == true) ? "checkmark.circle.fill" : "square.and.arrow.down.fill")
+                        Image(systemName: "square.and.arrow.down.fill")
                             .font(.system(size: 14, weight: .bold))
-
-                        Text(saveButtonTitle(isSingle: isSingle, isAll: isAll, count: count, singleSaved: singlePhoto?.isSavedToPhotos ?? false))
+                        Text(isAll ? "Save All (\(count))" : (hasSelection ? "Save (\(count))" : "Save"))
                             .font(.system(size: 13, weight: .bold))
                     }
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(hasSelection ? .black : Color.white.opacity(0.4))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(
-                    LinearGradient(
+                    hasSelection
+                    ? LinearGradient(
                         colors: [Color.filmPrimary.opacity(0.95), Color.filmPrimary],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    : LinearGradient(
+                        colors: [Color.white.opacity(0.15), Color.white.opacity(0.08)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -565,12 +511,15 @@ struct FilmRollReviewView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color.white.opacity(0.4), lineWidth: 1)
+                        .strokeBorder(
+                            hasSelection ? Color.white.opacity(0.4) : Color.white.opacity(0.1),
+                            lineWidth: 1
+                        )
                 )
-                .shadow(color: Color.filmPrimary.opacity(0.4), radius: 8, y: 3)
+                .shadow(color: hasSelection ? Color.filmPrimary.opacity(0.4) : .clear, radius: 8, y: 3)
             }
             .buttonStyle(.plain)
-            .disabled(isSavingBatch)
+            .disabled(!hasSelection || isSavingBatch)
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
@@ -582,15 +531,5 @@ struct FilmRollReviewView: View {
                 endPoint: .bottom
             )
         )
-    }
-
-    private func saveButtonTitle(isSingle: Bool, isAll: Bool, count: Int, singleSaved: Bool) -> String {
-        if isSingle {
-            return singleSaved ? "Saved" : "Save"
-        } else if isAll {
-            return "Save All (\(count))"
-        } else {
-            return "Save (\(count))"
-        }
     }
 }
