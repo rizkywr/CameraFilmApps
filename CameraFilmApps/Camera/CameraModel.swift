@@ -144,27 +144,11 @@ final class CameraModel {
         let renderer = renderer
         service.onFrame = { frame in renderer?.enqueue(frame: frame) }
         renderer?.setAdjustments(adjustments)
-        if let rollThumb = FilmRollStore.shared.latestThumbnail {
-            self.lastPhoto = rollThumb
-        } else {
-            loadLatestPhotoFromLibrary()
-        }
+        self.lastPhoto = FilmRollStore.shared.latestThumbnail
     }
 
     func refreshLatestPhoto() {
-        if let rollThumb = FilmRollStore.shared.latestThumbnail {
-            self.lastPhoto = rollThumb
-        } else {
-            Task { @MainActor in
-                if let photo = await PhotoWriter.fetchLatestPhotoThumbnail() {
-                    self.lastPhoto = photo
-                }
-            }
-        }
-    }
-
-    private func loadLatestPhotoFromLibrary() {
-        refreshLatestPhoto()
+        self.lastPhoto = FilmRollStore.shared.latestThumbnail
     }
 
     private static func savedAdjustments() -> FilmAdjustments {

@@ -173,7 +173,7 @@ struct CameraScreen: View {
                 } label: {
                     ZStack(alignment: .center) {
                         Group {
-                            if let photo = rollStore.latestThumbnail ?? camera.lastPhoto {
+                            if let photo = rollStore.latestThumbnail {
                                 Image(uiImage: photo)
                                     .resizable()
                                     .scaledToFill()
