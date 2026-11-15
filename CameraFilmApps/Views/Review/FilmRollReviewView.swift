@@ -102,7 +102,7 @@ struct FilmRollReviewView: View {
             ) {
                 let count = selectedIDs.count
                 let isAll = count == rollStore.photos.count
-                Button(isAll ? "Delete All (\(count))" : "Delete \(count) Photo\(count > 1 ? "s" : "")", role: .destructive) {
+                Button(isAll ? "Delete All" : "Delete", role: .destructive) {
                     let generator = UINotificationFeedbackGenerator()
                     generator.notificationOccurred(.success)
                     withAnimation(.spring(duration: 0.25)) {
@@ -426,7 +426,7 @@ struct FilmRollReviewView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 13, weight: .bold))
-                    Text(isAll ? "Delete All (\(count))" : (hasSelection ? "Delete (\(count))" : "Delete"))
+                    Text(isAll ? "Delete All" : "Delete")
                         .font(.system(size: 13, weight: .bold))
                 }
                 .foregroundStyle(hasSelection ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color.white.opacity(0.3))
@@ -484,7 +484,7 @@ struct FilmRollReviewView: View {
                     } else {
                         Image(systemName: "square.and.arrow.down.fill")
                             .font(.system(size: 14, weight: .bold))
-                        Text(isAll ? "Save All (\(count))" : (hasSelection ? "Save (\(count))" : "Save"))
+                        Text(isAll ? "Save All" : "Save")
                             .font(.system(size: 13, weight: .bold))
                     }
                 }
