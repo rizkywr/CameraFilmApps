@@ -136,18 +136,14 @@ struct FilmRollReviewView: View {
                 generator.impactOccurred()
                 dismiss()
             } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 13, weight: .bold))
-                    Text("Close")
-                        .font(.system(size: 13, weight: .semibold))
-                }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.black.opacity(0.55))
-                .clipShape(Capsule())
-                .overlay(Capsule().strokeBorder(Color.white.opacity(0.2), lineWidth: 1))
+                Text("Close")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(Color.black.opacity(0.55))
+                    .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.2), lineWidth: 1))
             }
             .buttonStyle(.plain)
 
