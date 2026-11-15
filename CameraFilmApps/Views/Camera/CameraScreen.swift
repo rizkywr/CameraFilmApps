@@ -61,12 +61,12 @@ struct CameraScreen: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.shutterCount)
         .onChange(of: rollStore.photos.count) { oldCount, newCount in
             guard newCount > oldCount else { return }
-            withAnimation(.spring(response: 0.28, dampingFraction: 0.45)) {
+            withAnimation(.spring(response: 0.22, dampingFraction: 0.65)) {
                 isThumbnailPopping = true
             }
             Task {
-                try? await Task.sleep(for: .milliseconds(320))
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) {
+                try? await Task.sleep(for: .milliseconds(180))
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.72)) {
                     isThumbnailPopping = false
                 }
             }
@@ -192,23 +192,16 @@ struct CameraScreen: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .strokeBorder(
                                     LinearGradient(
-                                        colors: isThumbnailPopping
-                                            ? [Color.filmPrimary, Color.white]
-                                            : [Color.white.opacity(0.6), Color.black.opacity(0.8)],
+                                        colors: [Color.white.opacity(0.6), Color.black.opacity(0.8)],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
                                     lineWidth: 2
                                 )
                         )
-                        .shadow(
-                            color: isThumbnailPopping ? Color.filmPrimary.opacity(0.6) : Color.black.opacity(0.6),
-                            radius: isThumbnailPopping ? 6 : 3,
-                            x: 0,
-                            y: 2
-                        )
+                        .shadow(color: .black.opacity(0.6), radius: 3, x: 0, y: 2)
                     }
-                    .scaleEffect(isThumbnailPopping ? 1.22 : 1.0)
+                    .scaleEffect(isThumbnailPopping ? 1.12 : 1.0)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Review Film Roll")
