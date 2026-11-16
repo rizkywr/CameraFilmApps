@@ -254,62 +254,63 @@ struct FilmRollReviewView: View {
         let isSelected = selectedIDs.contains(photo.id)
 
         return ZStack(alignment: .topTrailing) {
-            VStack(spacing: 0) {
-                // Photo Thumbnail with authentic 3:4 portrait aspect ratio (no squishing/gepeng)
-                ZStack(alignment: .topLeading) {
-                    Color.black
+            // Photo Thumbnail with authentic 3:4 portrait aspect ratio (clean, no time copy)
+            ZStack(alignment: .topLeading) {
+                Color.black
 
-                    if let thumb = rollStore.thumbnail(for: photo) {
-                        Image(uiImage: thumb)
-                            .resizable()
-                            .scaledToFill()
-                    } else {
-                        Color(white: 0.15)
-                            .overlay {
-                                ProgressView()
-                                    .tint(Color.filmPrimary)
-                            }
-                    }
-
-                    // Vintage film stamp badge (top leading)
-                    Text(photo.filmName.uppercased())
-                        .font(.system(size: 8, weight: .black, design: .monospaced))
-                        .foregroundStyle(Color.filmPrimary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(Color.black.opacity(0.8))
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .strokeBorder(Color.filmPrimary.opacity(0.5), lineWidth: 0.7)
-                        )
-                        .padding(8)
-                }
-                .aspectRatio(3 / 4, contentMode: .fit)
-                .clipped()
-
-                // Info Footer Strip on Card
-                HStack {
-                    Text(photo.formattedTime)
-                        .font(.system(size: 9, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color(white: 0.7))
-
-                    Spacer()
-
-                    if photo.isSavedToPhotos {
-                        HStack(spacing: 3) {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 8, weight: .bold))
-                            Text("SAVED")
-                                .font(.system(size: 8, weight: .heavy, design: .monospaced))
+                if let thumb = rollStore.thumbnail(for: photo) {
+                    Image(uiImage: thumb)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Color(white: 0.15)
+                        .overlay {
+                            ProgressView()
+                                .tint(Color.filmPrimary)
                         }
-                        .foregroundStyle(Color.green)
+                }
+
+                // Vintage film stamp badge (top leading)
+                Text(photo.filmName.uppercased())
+                    .font(.system(size: 8, weight: .black, design: .monospaced))
+                    .foregroundStyle(Color.filmPrimary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.8))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(Color.filmPrimary.opacity(0.5), lineWidth: 0.7)
+                    )
+                    .padding(8)
+
+                // Saved badge (bottom trailing overlay)
+                if photo.isSavedToPhotos {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            HStack(spacing: 3) {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 8, weight: .bold))
+                                Text("SAVED")
+                                    .font(.system(size: 8, weight: .heavy, design: .monospaced))
+                            }
+                            .foregroundStyle(Color.green)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(Color.black.opacity(0.8))
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .strokeBorder(Color.green.opacity(0.6), lineWidth: 0.7)
+                            )
+                            .padding(8)
+                        }
                     }
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(Color.black.opacity(0.6))
             }
+            .aspectRatio(3 / 4, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
