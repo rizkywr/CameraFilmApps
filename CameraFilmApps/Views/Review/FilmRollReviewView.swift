@@ -44,7 +44,7 @@ struct FilmRollReviewView: View {
                         emptyRollView
                     } else {
                         ScrollView {
-                            LazyVGrid(columns: columns, spacing: 14) {
+                            LazyVGrid(columns: columns, spacing: 0) {
                                 ForEach(rollStore.photos) { photo in
                                     photoCard(photo)
                                 }
@@ -263,7 +263,7 @@ struct FilmRollReviewView: View {
                     if let thumb = rollStore.thumbnail(for: photo) {
                         Image(uiImage: thumb)
                             .resizable()
-                            .scaledToFill()
+                            .scaledToFit()
                     } else {
                         Color(white: 0.15)
                             .overlay {
@@ -300,12 +300,11 @@ struct FilmRollReviewView: View {
                 }
             }
             .aspectRatio(3 / 4, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                Rectangle()
                     .strokeBorder(
-                        (isSelectionMode && isSelected) ? Color.filmPrimary : Color.white.opacity(0.18),
-                        lineWidth: (isSelectionMode && isSelected) ? 2.5 : 1
+                        (isSelectionMode && isSelected) ? Color.filmPrimary : Color.clear,
+                        lineWidth: (isSelectionMode && isSelected) ? 2.5 : 0
                     )
             )
             .shadow(color: (isSelectionMode && isSelected) ? Color.filmPrimary.opacity(0.3) : .black.opacity(0.5), radius: 5, y: 3)

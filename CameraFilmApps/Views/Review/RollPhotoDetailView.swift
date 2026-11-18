@@ -50,8 +50,9 @@ struct RollPhotoDetailView: View {
                                 .resizable()
                                 .scaledToFit()
                         }
-                        .shadow(color: .black.opacity(0.8), radius: 14, x: 0, y: 6)
-                        .padding(.horizontal, 16)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .shadow(color: .black.opacity(0.85), radius: 16, x: 0, y: 8)
+                        .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                     } else {
                         ProgressView()
