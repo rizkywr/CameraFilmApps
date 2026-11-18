@@ -52,7 +52,7 @@ struct FilmLibraryView: View {
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 6) {
                         FilmCanisterIconView(isSelected: true)
-                        Text("ROLLS FILM")
+                        Text("Rolls Film")
                             .font(.system(size: 13, weight: .black, design: .monospaced))
                             .foregroundStyle(.white)
                     }
@@ -61,7 +61,7 @@ struct FilmLibraryView: View {
                     Button {
                         confirmsDownloadAll = true
                     } label: {
-                        Text("IMPORT ALL")
+                        Text("Import All")
                             .font(.system(size: 12, weight: .heavy))
                             .foregroundStyle(Color.filmPrimary)
                     }
@@ -71,7 +71,7 @@ struct FilmLibraryView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Text("DONE")
+                        Text("Done")
                             .font(.system(size: 12, weight: .heavy))
                             .foregroundStyle(Color.filmPrimary)
                     }
@@ -212,7 +212,7 @@ struct FilmLibraryView: View {
                 } description: {
                     Text("Import films from Rolls Film to load them into your analog camera.")
                 } actions: {
-                    Button("BROWSE ROLLS FILM") { scope = .explore }
+                    Button("Browse Rolls Film") { scope = .explore }
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(Color.black)
                         .padding(.horizontal, 16)
@@ -429,7 +429,7 @@ private struct BulkDownloadBar: View {
     var body: some View {
         HStack(spacing: 12) {
             ProgressView(value: progress.fraction) {
-                Text("IMPORTING FILMS")
+                Text("Importing Films")
                     .font(.system(size: 10, weight: .heavy))
                     .foregroundStyle(Color.filmPrimary)
             } currentValueLabel: {
