@@ -16,34 +16,52 @@ struct ViewfinderOSD: View {
         ZStack {
             // Top HUD: PRO Quota Badge (Left) & Film Emulation Badge (Right)
             HStack {
-                // Top-Left: PRO / Roll Quota badge
+                // Top-Left: Vintage Film Roll Frame Counter & Limit Indicator
                 Button {
                     let impact = UIImpactFeedbackGenerator(style: .light)
                     impact.impactOccurred()
                     camera.showsPaywall = true
                 } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(Color(red: 0.95, green: 0.72, blue: 0.35))
+                    HStack(spacing: 5) {
                         if proStore.isPro {
-                            Text("Pro")
-                                .font(.system(size: 10, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 9))
+                                .foregroundStyle(Color.filmPrimary)
+                            Text("PRO • ∞")
+                                .font(.system(size: 11, weight: .heavy, design: .rounded))
+                                .foregroundStyle(Color.filmPrimary)
                         } else {
-                            let shots = proStore.totalCapturedCount
-                            Text(shots >= ProStore.maxFreeShots ? "25/25 Used" : "\(shots)/25 Free")
-                                .font(.system(size: 10, weight: .bold, design: .rounded))
-                                .foregroundStyle(shots >= ProStore.maxFreeShots ? Color(red: 0.95, green: 0.55, blue: 0.45) : .white)
+                            let remaining = proStore.remainingFreeShots
+                            let isDepleted = remaining <= 0
+                            
+                            // Film canister icon
+                            Image(systemName: "film.stack")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(isDepleted ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color.filmPrimary)
+
+                            // Analog frame counter display (e.g. 25 EXP or 18/25)
+                            HStack(spacing: 2) {
+                                Text(String(format: "%02d", remaining))
+                                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                                    .foregroundStyle(isDepleted ? Color(red: 0.95, green: 0.35, blue: 0.35) : .white)
+                                Text("EXP")
+                                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                                    .foregroundStyle(Color.white.opacity(0.6))
+                            }
                         }
                     }
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 4)
-                    .background(Color.black.opacity(0.6))
-                    .clipShape(.rect(cornerRadius: 6))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4.5)
+                    .background(Color.black.opacity(0.65))
+                    .clipShape(Capsule())
                     .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .strokeBorder(Color(red: 0.95, green: 0.72, blue: 0.35).opacity(0.4), lineWidth: 0.8)
+                        Capsule()
+                            .strokeBorder(
+                                (proStore.isPro || proStore.remainingFreeShots > 0)
+                                    ? Color.filmPrimary.opacity(0.5)
+                                    : Color(red: 0.95, green: 0.35, blue: 0.35).opacity(0.7),
+                                lineWidth: 1
+                            )
                     )
                 }
                 .buttonStyle(.plain)
