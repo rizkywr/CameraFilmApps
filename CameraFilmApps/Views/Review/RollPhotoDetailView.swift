@@ -78,7 +78,7 @@ struct RollPhotoDetailView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(Color.filmPrimary)
                         Text(toastMessage)
-                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                     }
                     .padding(.horizontal, 16)
@@ -117,12 +117,12 @@ struct RollPhotoDetailView: View {
             Spacer()
 
             VStack(spacing: 2) {
-                Text(photo.filmName.uppercased())
-                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                Text(photo.filmName.capitalized)
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.filmPrimary)
 
                 Text("\(photo.formattedDate) • \(photo.formattedTime)")
-                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(white: 0.7))
             }
 
@@ -164,7 +164,7 @@ struct RollPhotoDetailView: View {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 13, weight: .bold))
                     Text("Delete")
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
                 }
                 .foregroundStyle(Color(red: 0.95, green: 0.35, blue: 0.35))
                 .frame(maxWidth: .infinity)
@@ -189,14 +189,14 @@ struct RollPhotoDetailView: View {
                         _ = try await rollStore.saveToSystemPhotos(photos: [photo])
                         withAnimation {
                             isSaved = true
-                            toastMessage = "SAVED TO GALLERY"
+                            toastMessage = "Saved To Gallery"
                         }
                         let successGen = UINotificationFeedbackGenerator()
                         successGen.notificationOccurred(.success)
                         try? await Task.sleep(for: .seconds(2))
                         withAnimation { toastMessage = nil }
                     } catch {
-                        withAnimation { toastMessage = "SAVE FAILED" }
+                        withAnimation { toastMessage = "Save Failed" }
                         try? await Task.sleep(for: .seconds(2))
                         withAnimation { toastMessage = nil }
                     }

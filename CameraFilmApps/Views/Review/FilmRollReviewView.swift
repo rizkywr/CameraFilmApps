@@ -73,7 +73,7 @@ struct FilmRollReviewView: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundStyle(Color.filmPrimary)
                             Text(toastMessage)
-                                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                .font(.system(size: 13, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                         }
                         .padding(.horizontal, 18)
@@ -137,7 +137,7 @@ struct FilmRollReviewView: View {
                 dismiss()
             } label: {
                 Text("Close")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
@@ -151,12 +151,12 @@ struct FilmRollReviewView: View {
 
             // Center Title
             VStack(spacing: 2) {
-                Text("FILM ROLL REVIEW")
-                    .font(.system(size: 13, weight: .black, design: .monospaced))
+                Text("Film Roll Review")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.filmPrimary)
 
-                Text(isSelectionMode ? "\(selectedIDs.count) OF \(rollStore.photos.count) SELECTED" : "ROLL #01 • \(rollStore.photos.count) FRAMES")
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                Text(isSelectionMode ? "\(selectedIDs.count) Of \(rollStore.photos.count) Selected" : "Roll #01 • \(rollStore.photos.count) Frames")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(white: 0.65))
             }
 
@@ -175,7 +175,7 @@ struct FilmRollReviewView: View {
                     }
                 } label: {
                     Text(isSelectionMode ? "Done" : "Select")
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(isSelectionMode ? Color(white: 0.9) : Color.filmPrimary)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
@@ -224,7 +224,7 @@ struct FilmRollReviewView: View {
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Color.filmPrimary)
                     Text(allSelected ? "Deselect All" : "Select All (\(rollStore.photos.count))")
-                        .font(.system(size: 12, weight: .black, design: .monospaced))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 }
                 .padding(.horizontal, 12)
@@ -239,8 +239,8 @@ struct FilmRollReviewView: View {
 
             Spacer()
 
-            Text("\(selectedIDs.count) selected")
-                .font(.system(size: 12, weight: .bold, design: .monospaced))
+            Text("\(selectedIDs.count) Selected")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.filmPrimary)
         }
         .padding(.horizontal, 16)
@@ -271,8 +271,8 @@ struct FilmRollReviewView: View {
                 }
 
                 // Vintage film stamp badge (top leading)
-                Text(photo.filmName.uppercased())
-                    .font(.system(size: 8, weight: .black, design: .monospaced))
+                Text(photo.filmName.capitalized)
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.filmPrimary)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 3)
@@ -293,8 +293,8 @@ struct FilmRollReviewView: View {
                             HStack(spacing: 3) {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 8, weight: .bold))
-                                Text("SAVED")
-                                    .font(.system(size: 8, weight: .heavy, design: .monospaced))
+                                Text("Saved")
+                                    .font(.system(size: 8, weight: .bold, design: .rounded))
                             }
                             .foregroundStyle(Color.green)
                             .padding(.horizontal, 6)
@@ -388,12 +388,12 @@ struct FilmRollReviewView: View {
                     .foregroundStyle(Color.filmPrimary)
             }
 
-            Text("NO FRAMES CAPTURED")
-                .font(.system(size: 15, weight: .black, design: .monospaced))
+            Text("No Frames Captured")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
 
             Text("Photos taken with the camera will appear here on your film roll.")
-                .font(.system(size: 13))
+                .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(Color(white: 0.65))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 36)
@@ -422,7 +422,7 @@ struct FilmRollReviewView: View {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 13, weight: .bold))
                     Text(isAll ? "Delete All" : "Delete")
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
                 }
                 .foregroundStyle(hasSelection ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color.white.opacity(0.3))
                 .frame(maxWidth: .infinity)
@@ -455,14 +455,14 @@ struct FilmRollReviewView: View {
                     do {
                         let saved = try await rollStore.saveToSystemPhotos(photos: targetPhotos)
                         withAnimation {
-                            toastMessage = "\(saved) PHOTO\(saved > 1 ? "S" : "") SAVED TO GALLERY"
+                            toastMessage = "\(saved) Photo\(saved > 1 ? "s" : "") Saved To Gallery"
                         }
                         let successGen = UINotificationFeedbackGenerator()
                         successGen.notificationOccurred(.success)
                         try? await Task.sleep(for: .seconds(2))
                         withAnimation { toastMessage = nil }
                     } catch {
-                        withAnimation { toastMessage = "SAVE FAILED" }
+                        withAnimation { toastMessage = "Save Failed" }
                         try? await Task.sleep(for: .seconds(2))
                         withAnimation { toastMessage = nil }
                     }
@@ -475,7 +475,7 @@ struct FilmRollReviewView: View {
                             .tint(.black)
                             .scaleEffect(0.9)
                         Text("Saving...")
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                     } else {
                         Image(systemName: "square.and.arrow.down.fill")
                             .font(.system(size: 14, weight: .bold))

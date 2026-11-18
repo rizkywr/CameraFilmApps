@@ -62,7 +62,7 @@ struct AdjustmentsSheet: View {
                                 } label: {
                                     HStack(spacing: 6) {
                                         Image(systemName: tab.icon)
-                                            .font(.system(size: 11, weight: .bold))
+                                            .font(.system(size: 11, weight: .bold, design: .rounded))
                                         Text(tab.rawValue)
                                             .font(.system(size: 11, weight: .heavy))
                                             .tracking(1)
@@ -121,7 +121,7 @@ struct AdjustmentsSheet: View {
                         withAnimation { camera.adjustments = .default }
                     } label: {
                         Text("RESET")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
                             .foregroundStyle(camera.adjustments == .default ? Color(white: 0.4) : Color.filmPrimary)
                     }
                     .disabled(camera.adjustments == .default)
@@ -151,10 +151,10 @@ struct AdjustmentsSheet: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     Label("BODY LEATHER SKIN", systemImage: "camera.macro")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(white: 0.7))
                     Spacer()
-                    Text(camera.cameraSkin.displayName.uppercased())
+                    Text(camera.cameraSkin.displayName.capitalized)
                         .font(.system(size: 10, weight: .heavy))
                         .foregroundStyle(Color.filmPrimary)
                 }
@@ -193,7 +193,7 @@ struct AdjustmentsSheet: View {
 
                                     if isSelected {
                                         Image(systemName: "checkmark")
-                                            .font(.system(size: 16, weight: .bold))
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
                                             .foregroundStyle(.white)
                                             .shadow(color: .black.opacity(0.8), radius: 2)
                                     }
@@ -237,7 +237,7 @@ struct AdjustmentsSheet: View {
                     // Frame Ratio
                     HStack {
                         Text("ASPECT RATIO")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(white: 0.7))
                         Spacer()
                         HStack(spacing: 6) {
@@ -268,7 +268,7 @@ struct AdjustmentsSheet: View {
                     // Grid Lines Toggle
                     HStack {
                         Label("GRID LINES", systemImage: "grid")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(white: 0.7))
                         Spacer()
                         Toggle("", isOn: $camera.showsGrid)
@@ -281,7 +281,7 @@ struct AdjustmentsSheet: View {
                     // Level / Horizon Balance Toggle
                     HStack {
                         Label("LEVEL / HORIZON BALANCE", systemImage: "water.waves")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(white: 0.7))
                         Spacer()
                         Toggle("", isOn: $camera.showsLevel)
@@ -349,11 +349,11 @@ private struct AnalogAdjustmentRow: View {
             HStack {
                 HStack(spacing: 6) {
                     Image(systemName: control.systemImage)
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(iconColor)
 
-                    Text(control.title.uppercased())
-                        .font(.system(size: 11, weight: .bold))
+                    Text(control.title.capitalized)
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(white: 0.9))
                 }
 
