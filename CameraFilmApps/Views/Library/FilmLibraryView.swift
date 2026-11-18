@@ -11,6 +11,13 @@ struct FilmLibraryView: View {
         case explore = "ROLLS FILM"
         case myFilms = "MY FILM"
         var id: String { rawValue }
+
+        var iconName: String {
+            switch self {
+            case .explore: return "film.stack"
+            case .myFilms: return "camera.aperture"
+            }
+        }
     }
 
     @Environment(FilmLibrary.self) private var library
@@ -49,7 +56,11 @@ struct FilmLibraryView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Picker("Section", selection: $scope) {
-                        ForEach(Scope.allCases) { Text($0.rawValue).tag($0) }
+                        ForEach(Scope.allCases) { s in
+                            Image(systemName: s.iconName)
+                                .tag(s)
+                                .accessibilityLabel(s.rawValue)
+                        }
                     }
                     .pickerStyle(.segmented)
                     .fixedSize()
