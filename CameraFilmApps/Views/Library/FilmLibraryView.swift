@@ -145,6 +145,9 @@ struct FilmLibraryView: View {
                 Button("Download All") {
                     Task { await library.downloadAll(filteredFilms) }
                 }
+                Button("Cancel", role: .destructive) {
+                    confirmsDownloadAll = false
+                }
             }
             .alert("Download Failed", isPresented: errorBinding) {
                 Button("OK", role: .cancel) {}
