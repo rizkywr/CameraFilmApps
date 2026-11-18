@@ -428,6 +428,10 @@ final class CameraModel {
         guard !isCapturing, let renderer else { return }
         isCapturing = true
         shutterCount += 1
+        if flashMode == .off {
+            // Normal instant shutter effect when flash is off
+            ShutterSoundService.shared.playShutterEffect()
+        }
         defer { isCapturing = false }
 
         do {
@@ -454,12 +458,14 @@ final class CameraModel {
         ShutterSoundService.shared.playShutterEffect()
         return CapturedPhoto(pixelBuffer: frame, metadata: [:])
         #else
-        // Play shutter sound at the exact millisecond the optical shutter/flash fires
-        let onWillCapture: @Sendable () -> Void = {
+        // Only trigger delayed sound via onWillCapture when flash is active (on or auto)
+        let isFlashActive = flashMode != .off
+        let onWillCapture: (@Sendable () -> Void)? = isFlashActive ? {
             DispatchQueue.main.async {
                 ShutterSoundService.shared.playShutterEffect()
             }
-        }
+        } : nil
+
         // Always capture in portrait orientation to match the locked portrait UI
         let captureAngle = rotationCoordinator?.videoRotationAngleForHorizonLevelPreview
         return try await service.capturePhoto(flash: flashMode.avMode,
