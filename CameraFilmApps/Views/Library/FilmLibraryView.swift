@@ -8,8 +8,8 @@ import SwiftUI
 /// Authentic analog film catalog, canister cards, and roll management.
 struct FilmLibraryView: View {
     enum Scope: String, CaseIterable, Identifiable {
-        case explore = "ROLLS FILM"
-        case myFilms = "MY FILM"
+        case explore = "Rolls Film"
+        case myFilms = "My Film"
         var id: String { rawValue }
 
         var iconName: String {
@@ -43,7 +43,7 @@ struct FilmLibraryView: View {
                 explore
             }
             .environment(\.editMode, $editMode)
-            .navigationTitle("FILM VAULT")
+            .navigationTitle("Film Vault")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, isPresented: $isSearchPresented, prompt: "Search Kodak, Fuji, Ilford…")
             .searchFocused($isSearchFocused)
@@ -53,7 +53,7 @@ struct FilmLibraryView: View {
                     HStack(spacing: 6) {
                         FilmCanisterIconView(isSelected: true)
                         Text("Rolls Film")
-                            .font(.system(size: 13, weight: .black, design: .monospaced))
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                     }
                 }
@@ -62,7 +62,7 @@ struct FilmLibraryView: View {
                         confirmsDownloadAll = true
                     } label: {
                         Text("Import All")
-                            .font(.system(size: 12, weight: .heavy))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.filmPrimary)
                     }
                     .disabled(library.notYetDownloaded(filteredFilms).isEmpty)
@@ -72,7 +72,7 @@ struct FilmLibraryView: View {
                         dismiss()
                     } label: {
                         Text("Done")
-                            .font(.system(size: 12, weight: .heavy))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.filmPrimary)
                     }
                 }
@@ -145,9 +145,9 @@ struct FilmLibraryView: View {
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                analogCategoryChip(title: "ALL", value: nil)
+                analogCategoryChip(title: "All", value: nil)
                 ForEach(library.categories, id: \.self) { cat in
-                    analogCategoryChip(title: Film.prettyCategory(cat).uppercased(), value: cat)
+                    analogCategoryChip(title: Film.prettyCategory(cat).capitalized, value: cat)
                 }
             }
             .padding(.horizontal, 14)
@@ -160,7 +160,7 @@ struct FilmLibraryView: View {
             withAnimation(.spring(duration: 0.2)) { category = value }
         } label: {
             Text(title)
-                .font(.system(size: 11, weight: .heavy))
+                .font(.system(size: 11, weight: .bold, design: .rounded))
                 .tracking(0.5)
                 .foregroundStyle(isSelected ? .black : Color(white: 0.8))
                 .padding(.horizontal, 12)
@@ -198,8 +198,8 @@ struct FilmLibraryView: View {
                 .onDelete { offsets in offsets.map { films[$0] }.forEach(remove) }
                 .onMove { library.moveMyFilms(from: $0, to: $1) }
             } footer: {
-                Text("FILMS IN THIS VAULT APPEAR IN THE CAMERA ROLL STRIP AND WORK OFFLINE.")
-                    .font(.system(size: 10, weight: .medium))
+                Text("Films In This Vault Appear In The Camera Roll Strip And Work Offline.")
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(white: 0.5))
             }
         }
@@ -213,7 +213,7 @@ struct FilmLibraryView: View {
                     Text("Import films from Rolls Film to load them into your analog camera.")
                 } actions: {
                     Button("Browse Rolls Film") { scope = .explore }
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.black)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -291,8 +291,8 @@ private struct AnalogFilmCanisterCard: View {
                     // Film type label at top edge
                     VStack {
                         HStack {
-                            Text(film.displayCategory.uppercased())
-                                .font(.system(size: 7, weight: .heavy))
+                            Text(film.displayCategory.capitalized)
+                                .font(.system(size: 8, weight: .bold, design: .rounded))
                                 .tracking(0.5)
                                 .foregroundStyle(Color.black)
                                 .padding(.horizontal, 4)
@@ -327,13 +327,13 @@ private struct AnalogFilmCanisterCard: View {
 
                 // Classic film label typography
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(film.displayName.uppercased())
-                        .font(.system(size: 10, weight: .heavy))
+                    Text(film.displayName.capitalized)
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
                         .lineLimit(1)
                         .foregroundStyle(isSelected ? Color.filmPrimary : Color(white: 0.95))
 
-                    Text(film.displayCategory)
-                        .font(.system(size: 8, weight: .medium))
+                    Text(film.displayCategory.capitalized)
+                        .font(.system(size: 8, weight: .medium, design: .rounded))
                         .lineLimit(1)
                         .foregroundStyle(Color(white: 0.5))
                 }
@@ -402,11 +402,11 @@ private struct AnalogMyFilmRow: View {
                 )
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(film.displayName.uppercased())
-                    .font(.system(size: 12, weight: .heavy))
+                Text(film.displayName.capitalized)
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .foregroundStyle(isSelected ? Color.filmPrimary : Color(white: 0.95))
-                Text(film.displayCategory.uppercased())
-                    .font(.system(size: 9, weight: .bold))
+                Text(film.displayCategory.capitalized)
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
                     .tracking(0.5)
                     .foregroundStyle(Color(white: 0.5))
             }
@@ -430,7 +430,7 @@ private struct BulkDownloadBar: View {
         HStack(spacing: 12) {
             ProgressView(value: progress.fraction) {
                 Text("Importing Films")
-                    .font(.system(size: 10, weight: .heavy))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.filmPrimary)
             } currentValueLabel: {
                 Text("\(progress.completed) / \(progress.total)")
@@ -441,7 +441,7 @@ private struct BulkDownloadBar: View {
 
             Button(action: onCancel) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 11, weight: .heavy))
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .frame(width: 28, height: 28)
                     .background(Color(white: 0.25))
