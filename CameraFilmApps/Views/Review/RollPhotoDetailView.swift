@@ -37,27 +37,22 @@ struct RollPhotoDetailView: View {
                 // Top Vintage Navigation Bar
                 topBar
 
-                // Center: High-Resolution Photo Display
+                // Center: High-Resolution Photo Display with Authentic 35mm Filmstrip Frame
                 ZStack {
                     if let image {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(.rect(cornerRadius: 12))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(
-                                        LinearGradient(
-                                            colors: [Color.white.opacity(0.4), Color.black.opacity(0.8)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 1.5
-                                    )
-                            )
-                            .shadow(color: .black.opacity(0.7), radius: 10, x: 0, y: 5)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
+                        let frameIdx = (rollStore.photos.firstIndex(where: { $0.id == photo.id }) ?? 0) + 1
+                        FilmstripFrameView(
+                            filmName: photo.filmName,
+                            frameNumber: frameIdx,
+                            isDetailView: true
+                        ) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                        }
+                        .shadow(color: .black.opacity(0.8), radius: 14, x: 0, y: 6)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
                     } else {
                         ProgressView()
                             .tint(Color.filmPrimary)

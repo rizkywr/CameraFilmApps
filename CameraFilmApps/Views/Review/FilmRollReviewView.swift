@@ -252,68 +252,57 @@ struct FilmRollReviewView: View {
 
     private func photoCard(_ photo: RollPhoto) -> some View {
         let isSelected = selectedIDs.contains(photo.id)
+        let frameIdx = (rollStore.photos.firstIndex(where: { $0.id == photo.id }) ?? 0) + 1
 
         return ZStack(alignment: .topTrailing) {
-            // Photo Thumbnail with authentic 3:4 portrait aspect ratio (clean, no time copy)
-            ZStack(alignment: .topLeading) {
-                Color.black
+            // Photo Thumbnail wrapped inside authentic 35mm filmstrip frame
+            FilmstripFrameView(filmName: photo.filmName, frameNumber: frameIdx) {
+                ZStack(alignment: .topLeading) {
+                    Color.black
 
-                if let thumb = rollStore.thumbnail(for: photo) {
-                    Image(uiImage: thumb)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    Color(white: 0.15)
-                        .overlay {
-                            ProgressView()
-                                .tint(Color.filmPrimary)
-                        }
-                }
-
-                // Vintage film stamp badge (top leading)
-                Text(photo.filmName.capitalized)
-                    .font(.system(size: 9, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.filmPrimary)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .background(Color.black.opacity(0.8))
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4)
-                            .strokeBorder(Color.filmPrimary.opacity(0.5), lineWidth: 0.7)
-                    )
-                    .padding(8)
-
-                // Saved badge (bottom trailing overlay)
-                if photo.isSavedToPhotos {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            HStack(spacing: 3) {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 8, weight: .bold))
-                                Text("Saved")
-                                    .font(.system(size: 8, weight: .bold, design: .rounded))
+                    if let thumb = rollStore.thumbnail(for: photo) {
+                        Image(uiImage: thumb)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        Color(white: 0.15)
+                            .overlay {
+                                ProgressView()
+                                    .tint(Color.filmPrimary)
                             }
-                            .foregroundStyle(Color.green)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 3)
-                            .background(Color.black.opacity(0.8))
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .strokeBorder(Color.green.opacity(0.6), lineWidth: 0.7)
-                            )
-                            .padding(8)
+                    }
+
+                    // Saved badge (bottom trailing overlay)
+                    if photo.isSavedToPhotos {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                HStack(spacing: 3) {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 8, weight: .bold))
+                                    Text("Saved")
+                                        .font(.system(size: 8, weight: .bold, design: .rounded))
+                                }
+                                .foregroundStyle(Color.green)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(Color.black.opacity(0.8))
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .strokeBorder(Color.green.opacity(0.6), lineWidth: 0.7)
+                                )
+                                .padding(6)
+                            }
                         }
                     }
                 }
             }
             .aspectRatio(3 / 4, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 8)
                     .strokeBorder(
                         (isSelectionMode && isSelected) ? Color.filmPrimary : Color.white.opacity(0.18),
                         lineWidth: (isSelectionMode && isSelected) ? 2.5 : 1
