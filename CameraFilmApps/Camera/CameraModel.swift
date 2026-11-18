@@ -76,11 +76,13 @@ final class CameraModel {
     enum TimerMode: Int, CaseIterable {
         case off = 0
         case threeSec = 3
+        case fiveSec = 5
         case tenSec = 10
         var title: String {
             switch self {
             case .off: return "OFF"
             case .threeSec: return "3s"
+            case .fiveSec: return "5s"
             case .tenSec: return "10s"
             }
         }
