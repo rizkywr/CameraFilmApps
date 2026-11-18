@@ -214,8 +214,7 @@ struct CameraScreen: View {
 
                 // Center: Big Chrome Domed Shutter Release Button
                 VintageShutterButton(
-                    isBusy: camera.isCapturing,
-                    isCountingDown: camera.isTimerCountingDown
+                    isBusy: camera.isCapturing
                 ) {
                     Task { await camera.capture() }
                 }
