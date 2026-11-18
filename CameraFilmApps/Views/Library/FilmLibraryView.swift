@@ -116,7 +116,7 @@ struct FilmLibraryView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Text("DONE")
+                        Text("CLOSE")
                             .font(.system(size: 12, weight: .heavy))
                             .foregroundStyle(Color.filmPrimary)
                     }
@@ -124,23 +124,7 @@ struct FilmLibraryView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     switch scope {
                     case .myFilms:
-                        if !library.myFilms.isEmpty {
-                            Button {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    editMode = (editMode == .active) ? .inactive : .active
-                                }
-                            } label: {
-                                if editMode == .active {
-                                    Text("CLOSE")
-                                        .font(.system(size: 12, weight: .heavy))
-                                        .foregroundStyle(Color.white)
-                                } else {
-                                    Text("EDIT")
-                                        .font(.system(size: 12, weight: .heavy))
-                                        .foregroundStyle(Color.filmPrimary)
-                                }
-                            }
-                        }
+                        EmptyView()
                     case .explore:
                         Button {
                             confirmsDownloadAll = true
@@ -258,9 +242,7 @@ struct FilmLibraryView: View {
             Section {
                 ForEach(films) { film in
                     Button {
-                        if editMode == .inactive {
-                            select(film)
-                        }
+                        select(film)
                     } label: {
                         AnalogMyFilmRow(film: film, isSelected: camera.selectedFilmID == film.id)
                     }
