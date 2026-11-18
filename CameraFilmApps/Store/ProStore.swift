@@ -10,7 +10,6 @@ import SwiftUI
 
 /// Plan options for Film Camera Pro
 enum ProPlanType: String, CaseIterable, Identifiable {
-    case yearly = "com.camerafilm.pro.yearly"
     case lifetime = "com.camerafilm.pro.lifetime"
     case monthly = "com.camerafilm.pro.monthly"
 
@@ -18,31 +17,27 @@ enum ProPlanType: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .yearly: "Yearly Access"
-        case .lifetime: "Lifetime Access"
-        case .monthly: "Monthly Access"
+        case .lifetime: "Lifetime Purchase"
+        case .monthly: "Monthly Subscription"
         }
     }
 
     var defaultPriceString: String {
         switch self {
-        case .yearly: "$19.99 / year"
-        case .lifetime: "$49.99 once"
-        case .monthly: "$2.99 / month"
+        case .lifetime: "Rp 99.000"
+        case .monthly: "Rp 19.000 / Bulan"
         }
     }
 
     var subtitle: String {
         switch self {
-        case .yearly: "Just $1.66/month, billed annually"
-        case .lifetime: "Pay once, keep forever"
-        case .monthly: "Flexible monthly billing"
+        case .lifetime: "Bayar sekali, miliki selamanya"
+        case .monthly: "Langganan bulanan fleksibel, batalkan kapan saja"
         }
     }
 
     var badge: String? {
         switch self {
-        case .yearly: "MOST POPULAR"
         case .lifetime: "BEST VALUE"
         case .monthly: nil
         }
@@ -54,8 +49,8 @@ enum ProPlanType: String, CaseIterable, Identifiable {
 final class ProStore: @unchecked Sendable {
     static let shared = ProStore()
 
-    /// Free quota of photos using film simulations per roll.
-    static let freeFilmQuotaPerRoll: Int = 3
+    /// Free quota of photos across all films before requiring Pro upgrade.
+    static let maxFreeShots: Int = 25
 
     /// True if user owns active Pro entitlement (subscription or lifetime)
     private(set) var isPro: Bool {
@@ -72,10 +67,19 @@ final class ProStore: @unchecked Sendable {
     private var transactionListenerTask: Task<Void, Never>?
     private enum Keys {
         static let isPro = "com.camerafilm.isPro"
+        static let totalCapturedCount = "com.camerafilm.totalCapturedCount"
+    }
+
+    /// Total photos captured across all films in app history
+    private(set) var totalCapturedCount: Int {
+        didSet {
+            UserDefaults.standard.set(totalCapturedCount, forKey: Keys.totalCapturedCount)
+        }
     }
 
     private init() {
         self.isPro = UserDefaults.standard.bool(forKey: Keys.isPro)
+        self.totalCapturedCount = UserDefaults.standard.integer(forKey: Keys.totalCapturedCount)
         self.transactionListenerTask = listenForTransactions()
 
         Task {
@@ -90,24 +94,22 @@ final class ProStore: @unchecked Sendable {
 
     // MARK: - Quota & Entitlement Helpers
 
-    /// Number of photos in the current roll that used film emulsions (i.e. not "Original").
-    func filmShotsCountInCurrentRoll() -> Int {
-        FilmRollStore.shared.photos.filter { $0.filmName != "Original" }.count
+    /// Records a captured shot toward the 25-shot free quota.
+    func recordShotTaken() {
+        guard !isPro else { return }
+        totalCapturedCount += 1
     }
 
-    /// Remaining free shots for the current roll when shooting with film emulsions.
-    var remainingFreeFilmShots: Int {
+    /// Remaining free shots before requiring Pro upgrade.
+    var remainingFreeShots: Int {
         if isPro { return Int.max }
-        let used = filmShotsCountInCurrentRoll()
-        return max(0, Self.freeFilmQuotaPerRoll - used)
+        return max(0, Self.maxFreeShots - totalCapturedCount)
     }
 
-    /// Determines if a photo can be taken with the chosen film simulation.
-    func canShoot(withFilmID filmID: String?) -> Bool {
-        // "Original" profile is always 100% free and unlimited
-        guard filmID != nil else { return true }
+    /// Determines if a photo can be taken across all films.
+    var canShoot: Bool {
         if isPro { return true }
-        return filmShotsCountInCurrentRoll() < Self.freeFilmQuotaPerRoll
+        return totalCapturedCount < Self.maxFreeShots
     }
 
     // MARK: - StoreKit 2 Fetching & Purchasing
@@ -118,9 +120,7 @@ final class ProStore: @unchecked Sendable {
             let productIDs = ProPlanType.allCases.map(\.rawValue)
             let fetched = try await Product.products(for: productIDs)
             self.products = fetched.sorted { p1, p2 in
-                // Order: Yearly, Lifetime, Monthly
-                if p1.id == ProPlanType.yearly.rawValue { return true }
-                if p2.id == ProPlanType.yearly.rawValue { return false }
+                // Order: Lifetime first, then Monthly
                 if p1.id == ProPlanType.lifetime.rawValue { return true }
                 return false
             }

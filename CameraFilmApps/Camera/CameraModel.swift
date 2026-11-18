@@ -355,8 +355,8 @@ final class CameraModel {
 
         guard !isCapturing, let renderer else { return }
 
-        // Enforce 3-shot free limit per roll for film emulations
-        if !ProStore.shared.canShoot(withFilmID: selectedFilmID) {
+        // Enforce 25-shot free limit across all films before Pro upgrade
+        if !ProStore.shared.canShoot {
             showsPaywall = true
             let impact = UINotificationFeedbackGenerator()
             impact.notificationOccurred(.warning)
@@ -447,6 +447,7 @@ final class CameraModel {
             lastPhoto = preview
             let filmTitle = selectedFilmName ?? "Original"
             await FilmRollStore.shared.addPhoto(data: data, thumbnail: preview, filmName: filmTitle)
+            ProStore.shared.recordShotTaken()
         } catch {
             captureError = error.localizedDescription
         }

@@ -27,14 +27,14 @@ struct ViewfinderOSD: View {
                             .font(.system(size: 10))
                             .foregroundStyle(Color(red: 0.95, green: 0.72, blue: 0.35))
                         if proStore.isPro {
-                            Text("PRO")
-                                .font(.system(size: 10, weight: .heavy))
+                            Text("Pro")
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                         } else {
-                            let shots = proStore.filmShotsCountInCurrentRoll()
-                            Text(shots >= ProStore.freeFilmQuotaPerRoll ? "3/3 USED" : "\(shots)/3 FREE")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(shots >= ProStore.freeFilmQuotaPerRoll ? Color(red: 0.95, green: 0.55, blue: 0.45) : .white)
+                            let shots = proStore.totalCapturedCount
+                            Text(shots >= ProStore.maxFreeShots ? "25/25 Used" : "\(shots)/25 Free")
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .foregroundStyle(shots >= ProStore.maxFreeShots ? Color(red: 0.95, green: 0.55, blue: 0.45) : .white)
                         }
                     }
                     .padding(.horizontal, 7)

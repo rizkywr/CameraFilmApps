@@ -10,7 +10,7 @@ import StoreKit
 struct ProPaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var proStore = ProStore.shared
-    @State private var selectedPlan: ProPlanType = .yearly
+    @State private var selectedPlan: ProPlanType = .lifetime
 
     var body: some View {
         ZStack {
@@ -36,7 +36,7 @@ struct ProPaywallView: View {
                     headerSection
 
                     // Quota notification if user hit 3-shot limit
-                    if proStore.filmShotsCountInCurrentRoll() >= ProStore.freeFilmQuotaPerRoll {
+                    if proStore.totalCapturedCount >= ProStore.maxFreeShots {
                         quotaReachedBanner
                     }
 
@@ -110,8 +110,8 @@ struct ProPaywallView: View {
                     .foregroundStyle(Color.black.opacity(0.85))
             }
 
-            Text("FILM CAMERA PRO")
-                .font(.system(size: 26, weight: .black, design: .monospaced))
+            Text("Film Camera Pro")
+                .font(.system(size: 26, weight: .bold, design: .rounded))
                 .foregroundStyle(
                     LinearGradient(
                         colors: [Color.white, Color(white: 0.85)],
@@ -122,7 +122,7 @@ struct ProPaywallView: View {
                 .tracking(1.5)
 
             Text("Capture authentic analog memories with unlimited film stocks and master-level controls.")
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 14, weight: .medium, design: .rounded))
                 .foregroundStyle(Color.white.opacity(0.75))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 16)
@@ -138,12 +138,12 @@ struct ProPaywallView: View {
                 .foregroundStyle(Color(red: 0.95, green: 0.72, blue: 0.35))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Free Roll Limit Reached (3/3)")
-                    .font(.system(size: 13, weight: .bold))
+                Text("Free Limit Reached (25/25)")
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
-                Text("You've used all 3 free film shots in this roll. Upgrade to Pro to unlock unlimited film rolls!")
-                    .font(.system(size: 11))
+                Text("Kamu sudah menggunakan 25 kali jepret gratis. Upgrade ke Pro untuk menikmati foto analog tanpa batas!")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.white.opacity(0.8))
             }
 
@@ -167,7 +167,7 @@ struct ProPaywallView: View {
             featureRow(
                 icon: "infinity",
                 title: "Unlimited Film Captures",
-                subtitle: "Never worry about 3-shot limits. Shoot endless rolls freely."
+                subtitle: "Nikmati jepretan tanpa batas selamanya tanpa batasan 25 foto."
             )
             featureRow(
                 icon: "film",
@@ -205,11 +205,11 @@ struct ProPaywallView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
                 Text(subtitle)
-                    .font(.system(size: 12))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(Color.white.opacity(0.65))
             }
             Spacer()
@@ -249,12 +249,12 @@ struct ProPaywallView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 8) {
                         Text(plan.title)
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
 
                         if let badge = plan.badge {
                             Text(badge)
-                                .font(.system(size: 9, weight: .black))
+                                .font(.system(size: 9, weight: .bold, design: .rounded))
                                 .foregroundStyle(.black)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -264,7 +264,7 @@ struct ProPaywallView: View {
                     }
 
                     Text(plan.subtitle)
-                        .font(.system(size: 11))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.white.opacity(0.6))
                 }
 
@@ -273,7 +273,7 @@ struct ProPaywallView: View {
                 // Price
                 let priceText = proStore.products.first(where: { $0.id == plan.rawValue })?.displayPrice ?? plan.defaultPriceString
                 Text(priceText)
-                    .font(.system(size: 14, weight: .bold).monospacedDigit())
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(isSelected ? Color(red: 0.95, green: 0.72, blue: 0.35) : .white)
             }
             .padding(.horizontal, 16)
@@ -322,7 +322,7 @@ struct ProPaywallView: View {
                             .tint(.black)
                     } else {
                         HStack(spacing: 8) {
-                            Text("Upgrade to Film Pro")
+                            Text("Upgrade To Film Pro")
                                 .font(.system(size: 16, weight: .heavy, design: .rounded))
                                 .foregroundStyle(Color.black.opacity(0.9))
 
@@ -348,17 +348,19 @@ struct ProPaywallView: View {
 
     private var footerView: some View {
         VStack(spacing: 12) {
-            Button("Restore Purchases") {
+            Button {
                 Task {
                     await proStore.restorePurchases()
                 }
+            } label: {
+                Text("Restore Purchases")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
             }
-            .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(Color.white.opacity(0.7))
             .disabled(proStore.isRestoring)
 
             Text("Auto-renewable subscriptions can be cancelled anytime in App Store account settings.")
-                .font(.system(size: 10))
+                .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(Color.white.opacity(0.4))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 20)
