@@ -34,12 +34,12 @@ struct ViewfinderOSD: View {
                             let remaining = proStore.remainingFreeShots
                             let isDepleted = remaining <= 0
                             
-                            // Film canister icon
-                            Image(systemName: "film.stack")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(isDepleted ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color.filmPrimary)
+                            // 35mm Film Canister Roll icon matching Rolls Film
+                            FilmCanisterIconView(isSelected: true)
+                                .scaleEffect(0.72)
+                                .frame(width: 18, height: 16)
 
-                            // Analog frame counter display (e.g. 25 EXP or 18/25)
+                            // Analog frame counter display (e.g. 25 EXP)
                             HStack(spacing: 2) {
                                 Text(String(format: "%02d", remaining))
                                     .font(.system(size: 12, weight: .heavy, design: .rounded))
