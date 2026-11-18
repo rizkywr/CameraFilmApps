@@ -7,6 +7,7 @@ import AVFoundation
 import CoreMotion
 import Observation
 import UIKit
+import SwiftUI
 
 /// UI-facing camera state. Bridges SwiftUI to `CameraService` and `FilmRenderer`.
 @Observable
@@ -103,6 +104,9 @@ final class CameraModel {
     var whiteBalanceMode: WhiteBalanceMode = .auto
     var exposureBias: Float = 0.0 // -2.0 to +2.0
     var timerCountdown: Int? = nil
+    var isTorchPulsing: Bool = false
+    private(set) var isTimerCountingDown = false
+    private var timerTask: Task<Void, Never>?
 
 
     /// The film currently loaded into the renderer (`nil` = no film).
@@ -245,12 +249,14 @@ final class CameraModel {
     }
 
     func stop() {
+        cancelTimer()
         stopMotionUpdates()
         service.stop()
         if status == .running { status = .idle }
     }
 
     func flipCamera() async {
+        cancelTimer()
         guard status == .running, deviceInfo != nil, !isFlipping else { return }
         isFlipping = true
         let next: AVCaptureDevice.Position = position == .back ? .front : .back
@@ -323,19 +329,115 @@ final class CameraModel {
         }
     }
 
-    // MARK: - Capture
+    // MARK: - Capture & Timer
+
+    /// Cancels active timer countdown and extinguishes flash hint.
+    func cancelTimer() {
+        guard isTimerCountingDown else { return }
+        timerTask?.cancel()
+        timerTask = nil
+        isTimerCountingDown = false
+        timerCountdown = nil
+        isTorchPulsing = false
+        service.setTorch(on: false)
+        let impact = UINotificationFeedbackGenerator()
+        impact.notificationOccurred(.warning)
+    }
 
     func capture() async {
+        if isTimerCountingDown {
+            cancelTimer()
+            return
+        }
+
         guard !isCapturing, let renderer else { return }
+
         if timerMode != .off {
-            var remaining = timerMode.rawValue
+            runTimerCountdown()
+            return
+        }
+
+        await executeCapture()
+    }
+
+    private func runTimerCountdown() {
+        cancelTimer()
+        isTimerCountingDown = true
+        let duration = timerMode.rawValue
+
+        timerTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            var remaining = duration
+
+            defer {
+                self.isTimerCountingDown = false
+                self.timerCountdown = nil
+                self.isTorchPulsing = false
+                self.service.setTorch(on: false)
+                self.timerTask = nil
+            }
+
             while remaining > 0 {
-                timerCountdown = remaining
-                try? await Task.sleep(for: .seconds(1))
+                guard self.isTimerCountingDown && !Task.isCancelled else { return }
+                self.timerCountdown = remaining
+
+                if remaining > 3 {
+                    // Steady 1 flash per second (150ms ON, 850ms OFF = 1000ms)
+                    await self.flashTorchAndHint(onMs: 150, offMs: 850, isFinalRapid: false)
+                } else if remaining == 3 {
+                    // Accelerated blinking: 2 pulses in 1 second
+                    await self.flashTorchAndHint(onMs: 120, offMs: 180, isFinalRapid: false)
+                    guard self.isTimerCountingDown && !Task.isCancelled else { return }
+                    await self.flashTorchAndHint(onMs: 120, offMs: 580, isFinalRapid: false)
+                } else if remaining == 2 {
+                    // Faster blinking: 3 pulses in 1 second
+                    await self.flashTorchAndHint(onMs: 100, offMs: 150, isFinalRapid: false)
+                    guard self.isTimerCountingDown && !Task.isCancelled else { return }
+                    await self.flashTorchAndHint(onMs: 100, offMs: 150, isFinalRapid: false)
+                    guard self.isTimerCountingDown && !Task.isCancelled else { return }
+                    await self.flashTorchAndHint(onMs: 100, offMs: 400, isFinalRapid: false)
+                } else if remaining == 1 {
+                    // Final 1 second: Rapid strobe pulses leading right to shutter release!
+                    for _ in 0..<5 {
+                        guard self.isTimerCountingDown && !Task.isCancelled else { return }
+                        await self.flashTorchAndHint(onMs: 80, offMs: 120, isFinalRapid: true)
+                    }
+                }
+
                 remaining -= 1
             }
-            timerCountdown = nil
+
+            guard self.isTimerCountingDown && !Task.isCancelled else { return }
+            self.timerCountdown = nil
+            self.service.setTorch(on: false)
+            self.isTorchPulsing = false
+
+            await self.executeCapture()
         }
+    }
+
+    @MainActor
+    private func flashTorchAndHint(onMs: Int, offMs: Int, isFinalRapid: Bool) async {
+        guard isTimerCountingDown && !Task.isCancelled else { return }
+
+        service.setTorch(on: true)
+        withAnimation(.easeOut(duration: Double(onMs) / 1000.0 * 0.5)) {
+            isTorchPulsing = true
+        }
+        ShutterSoundService.shared.playTimerTick(isFinalRapid: isFinalRapid)
+
+        try? await Task.sleep(for: .milliseconds(onMs))
+
+        service.setTorch(on: false)
+        withAnimation(.easeOut(duration: Double(offMs) / 1000.0 * 0.5)) {
+            isTorchPulsing = false
+        }
+
+        try? await Task.sleep(for: .milliseconds(offMs))
+    }
+
+    private func executeCapture() async {
+        guard !isCapturing, let renderer else { return }
         isCapturing = true
         shutterCount += 1
         ShutterSoundService.shared.playShutterEffect()

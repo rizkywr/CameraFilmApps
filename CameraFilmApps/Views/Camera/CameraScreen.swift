@@ -209,7 +209,10 @@ struct CameraScreen: View {
                 Spacer()
 
                 // Center: Big Chrome Domed Shutter Release Button
-                VintageShutterButton(isBusy: camera.isCapturing) {
+                VintageShutterButton(
+                    isBusy: camera.isCapturing,
+                    isCountingDown: camera.isTimerCountingDown
+                ) {
                     Task { await camera.capture() }
                 }
                 .disabled(camera.status != .running)

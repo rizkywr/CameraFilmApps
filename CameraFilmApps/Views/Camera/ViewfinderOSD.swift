@@ -62,12 +62,31 @@ struct ViewfinderOSD: View {
             // Center: Crosshair
             CrosshairReticle()
 
+            // Screen flash pulse synchronised with timer LED torch
+            if camera.isTorchPulsing {
+                Color.white.opacity(0.25)
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
+
             // Timer countdown if active
             if let countdown = camera.timerCountdown {
-                Text("\(countdown)")
-                    .font(.system(size: 72, weight: .black, design: .rounded))
-                    .foregroundStyle(Color.white)
-                    .shadow(color: .black.opacity(0.8), radius: 10)
+                VStack(spacing: 8) {
+                    Text("\(countdown)")
+                        .font(.system(size: 80, weight: .black, design: .rounded))
+                        .foregroundStyle(Color.white)
+                        .scaleEffect(camera.isTorchPulsing ? 1.15 : 1.0)
+                        .shadow(color: .black.opacity(0.8), radius: 12)
+                        .animation(.spring(response: 0.2, dampingFraction: 0.5), value: camera.isTorchPulsing)
+
+                    Text("TAP SHUTTER TO CANCEL")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color.white.opacity(0.8))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.black.opacity(0.6))
+                        .clipShape(.capsule)
+                }
             }
         }
     }

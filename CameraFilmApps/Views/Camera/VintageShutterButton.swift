@@ -8,6 +8,7 @@ import SwiftUI
 /// Authentic two-tone concentric brushed metal / chrome shutter release button.
 struct VintageShutterButton: View {
     var isBusy: Bool
+    var isCountingDown: Bool = false
     var action: () -> Void
 
     var body: some View {
@@ -71,6 +72,16 @@ struct VintageShutterButton: View {
                 if isBusy {
                     ProgressView()
                         .tint(.black)
+                } else if isCountingDown {
+                    // Native iOS timer stop/cancel square inside the shutter button
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.red.opacity(0.85))
+                        .frame(width: 22, height: 22)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .strokeBorder(Color.white.opacity(0.9), lineWidth: 1.5)
+                        )
+                        .shadow(color: .black.opacity(0.4), radius: 2)
                 }
             }
         }

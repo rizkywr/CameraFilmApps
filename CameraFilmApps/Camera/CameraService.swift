@@ -89,6 +89,7 @@ nonisolated final class CameraService: NSObject, @unchecked Sendable, AVCaptureV
     }
 
     func stop() {
+        setTorch(on: false)
         sessionQueue.async {
             if self.session.isRunning { self.session.stopRunning() }
         }
@@ -253,6 +254,27 @@ nonisolated final class CameraService: NSObject, @unchecked Sendable, AVCaptureV
         }
     }
 
+    /// Turns the hardware LED torch on or off (e.g. for timer countdown hints).
+    func setTorch(on: Bool) {
+        sessionQueue.async { [weak self] in
+            guard let device = self?.deviceInput?.device,
+                  device.hasTorch,
+                  device.isTorchAvailable,
+                  (try? device.lockForConfiguration()) != nil else { return }
+
+            if on {
+                if device.isTorchModeSupported(.on) {
+                    try? device.setTorchModeOn(level: AVCaptureDevice.maxAvailableTorchLevel)
+                }
+            } else {
+                if device.isTorchModeSupported(.off) {
+                    device.torchMode = .off
+                }
+            }
+            device.unlockForConfiguration()
+        }
+    }
+
     /// Focus and meter at a point in device coordinates ((0,0) top-left of the
     /// landscape sensor image).
     func focus(at devicePoint: CGPoint) {
@@ -278,6 +300,14 @@ nonisolated final class CameraService: NSObject, @unchecked Sendable, AVCaptureV
     func capturePhoto(flash: AVCaptureDevice.FlashMode, rotationAngle: CGFloat?) async throws -> CapturedPhoto {
         try await withCheckedThrowingContinuation { continuation in
             sessionQueue.async {
+                // Ensure torch is off before photo capture starts
+                if let device = self.deviceInput?.device, device.hasTorch, device.torchMode != .off {
+                    if (try? device.lockForConfiguration()) != nil {
+                        if device.isTorchModeSupported(.off) { device.torchMode = .off }
+                        device.unlockForConfiguration()
+                    }
+                }
+
                 let format: [String: Any]? = self.photoOutput.availablePhotoPixelFormatTypes.contains(kCVPixelFormatType_32BGRA)
                     ? [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
                     : nil

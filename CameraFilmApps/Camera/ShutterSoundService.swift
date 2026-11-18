@@ -69,4 +69,15 @@ final class ShutterSoundService: @unchecked Sendable {
             lock.impactOccurred()
         }
     }
+
+    /// Plays crisp timer tick sound and haptic pulse matching native iOS camera timer.
+    func playTimerTick(isFinalRapid: Bool = false) {
+        // Multi-tier crisp haptics matching iOS timer
+        let generator = UIImpactFeedbackGenerator(style: isFinalRapid ? .rigid : .medium)
+        generator.prepare()
+        generator.impactOccurred()
+
+        // Crisp audio tick (System Sound 1057 = keyboard/timer click)
+        AudioServicesPlaySystemSound(1057)
+    }
 }
