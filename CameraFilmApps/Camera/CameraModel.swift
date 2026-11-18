@@ -459,12 +459,16 @@ final class CameraModel {
         return CapturedPhoto(pixelBuffer: frame, metadata: [:])
         #else
         // Only trigger delayed sound via onWillCapture when flash is active (on or auto)
-        let isFlashActive = flashMode != .off
-        let onWillCapture: (@Sendable () -> Void)? = isFlashActive ? {
-            DispatchQueue.main.async {
-                ShutterSoundService.shared.playShutterEffect()
+        let onWillCapture: (@Sendable () -> Void)?
+        if flashMode != .off {
+            onWillCapture = { @Sendable in
+                DispatchQueue.main.async {
+                    ShutterSoundService.shared.playShutterEffect()
+                }
             }
-        } : nil
+        } else {
+            onWillCapture = nil
+        }
 
         // Always capture in portrait orientation to match the locked portrait UI
         let captureAngle = rotationCoordinator?.videoRotationAngleForHorizonLevelPreview
