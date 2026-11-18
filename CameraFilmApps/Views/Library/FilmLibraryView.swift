@@ -40,12 +40,7 @@ struct FilmLibraryView: View {
                     .ignoresSafeArea()
                     .animation(.easeInOut(duration: 0.35), value: camera.cameraSkin)
 
-                Group {
-                    switch scope {
-                    case .explore: explore
-                    case .myFilms: myFilms
-                    }
-                }
+                explore
             }
             .environment(\.editMode, $editMode)
             .navigationTitle("FILM VAULT")
@@ -55,62 +50,12 @@ struct FilmLibraryView: View {
             .searchPresentationToolbarBehavior(.avoidHidingContent)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    HStack(spacing: 4) {
-                        // Rolls Film (Kodak 35mm Canister Icon)
-                        Button {
-                            let impact = UIImpactFeedbackGenerator(style: .light)
-                            impact.impactOccurred()
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                                scope = .explore
-                            }
-                        } label: {
-                            HStack(spacing: 6) {
-                                FilmCanisterIconView(isSelected: scope == .explore)
-                                Text("ROLLS")
-                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(scope == .explore ? Color.white : Color.white.opacity(0.45))
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(scope == .explore ? Color.white.opacity(0.16) : Color.clear)
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        // My Film (Fujifilm X100 Rangefinder Camera Icon)
-                        Button {
-                            let impact = UIImpactFeedbackGenerator(style: .light)
-                            impact.impactOccurred()
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
-                                scope = .myFilms
-                            }
-                        } label: {
-                            HStack(spacing: 6) {
-                                RangefinderCameraIconView(isSelected: scope == .myFilms)
-                                Text("MY FILM")
-                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(scope == .myFilms ? Color.white : Color.white.opacity(0.45))
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(scope == .myFilms ? Color.white.opacity(0.16) : Color.clear)
-                            )
-                        }
-                        .buttonStyle(.plain)
+                    HStack(spacing: 6) {
+                        FilmCanisterIconView(isSelected: true)
+                        Text("ROLLS FILM")
+                            .font(.system(size: 13, weight: .black, design: .monospaced))
+                            .foregroundStyle(.white)
                     }
-                    .padding(3)
-                    .background(
-                        RoundedRectangle(cornerRadius: 11)
-                            .fill(Color.black.opacity(0.55))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 11)
-                                    .strokeBorder(Color.white.opacity(0.15), lineWidth: 0.8)
-                            )
-                    )
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
@@ -122,19 +67,14 @@ struct FilmLibraryView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    switch scope {
-                    case .myFilms:
-                        EmptyView()
-                    case .explore:
-                        Button {
-                            confirmsDownloadAll = true
-                        } label: {
-                            Text("IMPORT ALL")
-                                .font(.system(size: 12, weight: .heavy))
-                                .foregroundStyle(Color.filmPrimary)
-                        }
-                        .disabled(library.notYetDownloaded(filteredFilms).isEmpty)
+                    Button {
+                        confirmsDownloadAll = true
+                    } label: {
+                        Text("IMPORT ALL")
+                            .font(.system(size: 12, weight: .heavy))
+                            .foregroundStyle(Color.filmPrimary)
                     }
+                    .disabled(library.notYetDownloaded(filteredFilms).isEmpty)
                 }
             }
             .confirmationDialog(
