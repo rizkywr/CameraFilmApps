@@ -142,14 +142,14 @@ struct FilmLibraryView: View {
                 isPresented: $confirmsDownloadAll,
                 titleVisibility: .visible
             ) {
-                Button("Download All") {
+                Button("Import All") {
                     Task { await library.downloadAll(filteredFilms) }
                 }
                 Button("Cancel", role: .destructive) {
                     confirmsDownloadAll = false
                 }
             }
-            .alert("Download Failed", isPresented: errorBinding) {
+            .alert("Import Failed", isPresented: errorBinding) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(library.errorMessage ?? "")
@@ -270,7 +270,7 @@ struct FilmLibraryView: View {
                 ContentUnavailableView {
                     Label("No Films In Vault", systemImage: "film.stack")
                 } description: {
-                    Text("Download films from Rolls Film to load them into your analog camera.")
+                    Text("Import films from Rolls Film to load them into your analog camera.")
                 } actions: {
                     Button("BROWSE ROLLS FILM") { scope = .explore }
                         .font(.system(size: 12, weight: .bold))
@@ -291,8 +291,8 @@ struct FilmLibraryView: View {
         let size = ByteCountFormatter.string(fromByteCount: Int64(films.count) * FilmLibrary.approximateBytesPerFilm, countStyle: .file)
         let scopeName = category.map { " \(Film.prettyCategory($0))" } ?? ""
         return films.count == 1
-            ? "Download 1\(scopeName) film (\(size))?"
-            : "Download \(films.count)\(scopeName) films (\(size))?"
+            ? "Import 1\(scopeName) film (\(size))?"
+            : "Import \(films.count)\(scopeName) films (\(size))?"
     }
 
     private var errorBinding: Binding<Bool> {
@@ -403,9 +403,9 @@ private struct AnalogFilmCanisterCard: View {
         .buttonStyle(.plain)
         .disabled(isDownloading)
         .contextMenu {
-            Button(isOwned ? "Use Film" : "Download & Use", systemImage: isOwned ? "camera" : "arrow.down.circle", action: onSelect)
+            Button(isOwned ? "Use Film" : "Import & Use", systemImage: isOwned ? "camera" : "arrow.down.circle", action: onSelect)
             if !isOwned {
-                Button("Download", systemImage: "arrow.down.to.line") {
+                Button("Import", systemImage: "arrow.down.to.line") {
                     Task { await library.download(film) }
                 }
             } else {
@@ -489,7 +489,7 @@ private struct BulkDownloadBar: View {
     var body: some View {
         HStack(spacing: 12) {
             ProgressView(value: progress.fraction) {
-                Text("DOWNLOADING FILMS")
+                Text("IMPORTING FILMS")
                     .font(.system(size: 10, weight: .heavy))
                     .foregroundStyle(Color.filmPrimary)
             } currentValueLabel: {
