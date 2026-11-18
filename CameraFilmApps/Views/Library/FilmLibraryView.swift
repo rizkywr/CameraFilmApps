@@ -129,8 +129,8 @@ struct FilmLibraryView: View {
                         Button {
                             confirmsDownloadAll = true
                         } label: {
-                            Image(systemName: "arrow.down.circle")
-                                .font(.system(size: 15, weight: .bold))
+                            Text("IMPORT ALL")
+                                .font(.system(size: 12, weight: .heavy))
                                 .foregroundStyle(Color.filmPrimary)
                         }
                         .disabled(library.notYetDownloaded(filteredFilms).isEmpty)
