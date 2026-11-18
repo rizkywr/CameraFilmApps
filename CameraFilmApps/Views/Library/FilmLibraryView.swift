@@ -55,15 +55,62 @@ struct FilmLibraryView: View {
             .searchPresentationToolbarBehavior(.avoidHidingContent)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Picker("Section", selection: $scope) {
-                        ForEach(Scope.allCases) { s in
-                            Image(systemName: s.iconName)
-                                .tag(s)
-                                .accessibilityLabel(s.rawValue)
+                    HStack(spacing: 4) {
+                        // Rolls Film (Kodak 35mm Canister Icon)
+                        Button {
+                            let impact = UIImpactFeedbackGenerator(style: .light)
+                            impact.impactOccurred()
+                            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                scope = .explore
+                            }
+                        } label: {
+                            HStack(spacing: 6) {
+                                FilmCanisterIconView(isSelected: scope == .explore)
+                                Text("ROLLS")
+                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(scope == .explore ? Color.white : Color.white.opacity(0.45))
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(scope == .explore ? Color.white.opacity(0.16) : Color.clear)
+                            )
                         }
+                        .buttonStyle(.plain)
+
+                        // My Film (Fujifilm X100 Rangefinder Camera Icon)
+                        Button {
+                            let impact = UIImpactFeedbackGenerator(style: .light)
+                            impact.impactOccurred()
+                            withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
+                                scope = .myFilms
+                            }
+                        } label: {
+                            HStack(spacing: 6) {
+                                RangefinderCameraIconView(isSelected: scope == .myFilms)
+                                Text("MY FILM")
+                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(scope == .myFilms ? Color.white : Color.white.opacity(0.45))
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(scope == .myFilms ? Color.white.opacity(0.16) : Color.clear)
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .pickerStyle(.segmented)
-                    .fixedSize()
+                    .padding(3)
+                    .background(
+                        RoundedRectangle(cornerRadius: 11)
+                            .fill(Color.black.opacity(0.55))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 11)
+                                    .strokeBorder(Color.white.opacity(0.15), lineWidth: 0.8)
+                            )
+                    )
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
