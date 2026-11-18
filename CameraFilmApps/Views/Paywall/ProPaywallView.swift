@@ -171,7 +171,7 @@ struct ProPaywallView: View {
             )
             featureRow(
                 icon: "film",
-                title: "All 90+ Authentic Film Stocks",
+                title: "All 200+ Authentic Film Stocks",
                 subtitle: "Full library of Kodak Portra, Tri-X, Velvia, Ektachrome & more."
             )
             featureRow(
