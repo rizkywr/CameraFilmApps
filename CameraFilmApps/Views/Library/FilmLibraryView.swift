@@ -116,7 +116,7 @@ struct FilmLibraryView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Text("CLOSE")
+                        Text("DONE")
                             .font(.system(size: 12, weight: .heavy))
                             .foregroundStyle(Color.filmPrimary)
                     }
