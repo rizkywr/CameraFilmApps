@@ -1,0 +1,111 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : ""
+      }
+    ]
+  },
+  "identifier" : "E2B8807F",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "49.99",
+      "familyShareable" : false,
+      "internalID" : "6447291001",
+      "localizations" : [
+        {
+          "description" : "Unlock all film stocks and features forever.",
+          "displayName" : "Lifetime Access",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.camerafilm.pro.lifetime",
+      "referenceName" : "Lifetime Access",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21400001",
+      "localizations" : [
+
+      ],
+      "name" : "Film Camera Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6447291002",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full access to all film stocks monthly.",
+              "displayName" : "Monthly Access",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.camerafilm.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Access",
+          "subscriptionGroupID" : "21400001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6447291003",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full access to all film stocks yearly.",
+              "displayName" : "Yearly Access",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.camerafilm.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yearly Access",
+          "subscriptionGroupID" : "21400001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

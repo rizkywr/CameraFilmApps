@@ -9,6 +9,7 @@ struct CameraScreen: View {
     @Environment(CameraModel.self) private var camera
     @Environment(FilmLibrary.self) private var library
     @Environment(FilmRollStore.self) private var rollStore
+    @Environment(ProStore.self) private var proStore
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -51,6 +52,9 @@ struct CameraScreen: View {
         }
         .sheet(isPresented: $isShowingRollReview) {
             FilmRollReviewView(skin: camera.cameraSkin)
+        }
+        .sheet(isPresented: Bindable(camera).showsPaywall) {
+            ProPaywallView()
         }
 
         .alert("Something Went Wrong", isPresented: errorBinding) {

@@ -21,6 +21,7 @@ struct MyApp: App {
     @State private var camera = CameraModel()
     @State private var library = FilmLibrary()
     @State private var rollStore = FilmRollStore.shared
+    @State private var proStore = ProStore.shared
 
     var body: some Scene {
         WindowGroup {
@@ -28,6 +29,7 @@ struct MyApp: App {
                 .environment(camera)
                 .environment(library)
                 .environment(rollStore)
+                .environment(proStore)
         }
     }
 }

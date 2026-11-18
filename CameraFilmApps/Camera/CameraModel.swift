@@ -105,6 +105,7 @@ final class CameraModel {
     var exposureBias: Float = 0.0 // -2.0 to +2.0
     var timerCountdown: Int? = nil
     var isTorchPulsing: Bool = false
+    var showsPaywall: Bool = false
     private(set) var isTimerCountingDown = false
     private var timerTask: Task<Void, Never>?
 
@@ -351,6 +352,14 @@ final class CameraModel {
         }
 
         guard !isCapturing, let renderer else { return }
+
+        // Enforce 3-shot free limit per roll for film emulations
+        if !ProStore.shared.canShoot(withFilmID: selectedFilmID) {
+            showsPaywall = true
+            let impact = UINotificationFeedbackGenerator()
+            impact.notificationOccurred(.warning)
+            return
+        }
 
         if timerMode != .off {
             runTimerCountdown()

@@ -9,12 +9,47 @@ import SwiftUI
 struct ViewfinderOSD: View {
     @Environment(CameraModel.self) private var camera
     @Environment(FilmLibrary.self) private var library
+    @Environment(ProStore.self) private var proStore
     var onFilmTap: () -> Void
 
     var body: some View {
         ZStack {
-            // Top-right: Film simulation indicator
-            HStack(spacing: 8) {
+            // Top HUD: PRO Quota Badge (Left) & Film Emulation Badge (Right)
+            HStack {
+                // Top-Left: PRO / Roll Quota badge
+                Button {
+                    let impact = UIImpactFeedbackGenerator(style: .light)
+                    impact.impactOccurred()
+                    camera.showsPaywall = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color(red: 0.95, green: 0.72, blue: 0.35))
+                        if proStore.isPro {
+                            Text("PRO")
+                                .font(.system(size: 10, weight: .heavy))
+                                .foregroundStyle(.white)
+                        } else {
+                            let shots = proStore.filmShotsCountInCurrentRoll()
+                            Text(shots >= ProStore.freeFilmQuotaPerRoll ? "3/3 USED" : "\(shots)/3 FREE")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(shots >= ProStore.freeFilmQuotaPerRoll ? Color(red: 0.95, green: 0.55, blue: 0.45) : .white)
+                        }
+                    }
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 4)
+                    .background(Color.black.opacity(0.6))
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .strokeBorder(Color(red: 0.95, green: 0.72, blue: 0.35).opacity(0.4), lineWidth: 0.8)
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
                 // Film simulation badge (tap to open film library)
                 Button(action: onFilmTap) {
                     let film = library.film(id: camera.selectedFilmID)
@@ -38,7 +73,7 @@ struct ViewfinderOSD: View {
                 }
                 .buttonStyle(.plain)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(14)
 
             // Bottom-right in viewfinder: Digital/Optical Zoom factor indicator
