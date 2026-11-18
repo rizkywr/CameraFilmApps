@@ -8,8 +8,8 @@ import SwiftUI
 /// Authentic analog film catalog, canister cards, and roll management.
 struct FilmLibraryView: View {
     enum Scope: String, CaseIterable, Identifiable {
-        case explore = "EXPLORE"
-        case myFilms = "MY ROLLS"
+        case explore = "ALL FILM"
+        case myFilms = "MY FILM"
         var id: String { rawValue }
     }
 
@@ -227,9 +227,9 @@ struct FilmLibraryView: View {
                 ContentUnavailableView {
                     Label("No Films In Vault", systemImage: "film.stack")
                 } description: {
-                    Text("Download films from Explore to load them into your analog camera.")
+                    Text("Download films from All Film to load them into your analog camera.")
                 } actions: {
-                    Button("EXPLORE FILMS") { scope = .explore }
+                    Button("BROWSE ALL FILM") { scope = .explore }
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(Color.black)
                         .padding(.horizontal, 16)
