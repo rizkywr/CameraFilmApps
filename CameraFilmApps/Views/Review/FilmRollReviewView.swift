@@ -478,9 +478,9 @@ struct FilmRollReviewView: View {
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                     } else {
                         Image(systemName: "square.and.arrow.down.fill")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
                         Text(isAll ? "Save All" : "Save")
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                     }
                 }
                 .foregroundStyle(hasSelection ? .black : Color.white.opacity(0.4))

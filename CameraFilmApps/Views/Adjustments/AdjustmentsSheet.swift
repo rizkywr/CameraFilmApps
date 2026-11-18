@@ -13,12 +13,12 @@ struct AdjustmentsSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     enum EditTab: String, CaseIterable, Identifiable {
-        case skin = "SKIN"
-        case frame = "FRAME"
-        case film = "FILM"
-        case light = "LIGHT"
-        case color = "COLOR"
-        case effects = "EFFECTS"
+        case skin = "Skin"
+        case frame = "Frame"
+        case film = "Film"
+        case light = "Light"
+        case color = "Color"
+        case effects = "Effects"
 
         var id: String { rawValue }
 
@@ -64,8 +64,8 @@ struct AdjustmentsSheet: View {
                                         Image(systemName: tab.icon)
                                             .font(.system(size: 11, weight: .bold, design: .rounded))
                                         Text(tab.rawValue)
-                                            .font(.system(size: 11, weight: .heavy))
-                                            .tracking(1)
+                                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                                            .tracking(0.5)
                                     }
                                     .foregroundStyle(isSelected ? .black : Color(white: 0.8))
                                     .padding(.horizontal, 14)
@@ -111,7 +111,7 @@ struct AdjustmentsSheet: View {
                     }
                 }
             }
-            .navigationTitle("STUDIO CALIBRATION")
+            .navigationTitle("Studio Calibration")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -120,8 +120,8 @@ struct AdjustmentsSheet: View {
                         generator.notificationOccurred(.warning)
                         withAnimation { camera.adjustments = .default }
                     } label: {
-                        Text("RESET")
-                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                        Text("Reset")
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(camera.adjustments == .default ? Color(white: 0.4) : Color.filmPrimary)
                     }
                     .disabled(camera.adjustments == .default)
@@ -132,8 +132,8 @@ struct AdjustmentsSheet: View {
                         generator.impactOccurred()
                         dismiss()
                     } label: {
-                        Text("DONE")
-                            .font(.system(size: 12, weight: .heavy))
+                        Text("Done")
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.filmPrimary)
                     }
                 }
@@ -150,12 +150,12 @@ struct AdjustmentsSheet: View {
         analogCard {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Label("BODY LEATHER SKIN", systemImage: "camera.macro")
+                    Label("Body Leather Skin", systemImage: "camera.macro")
                         .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(white: 0.7))
                     Spacer()
                     Text(camera.cameraSkin.displayName.capitalized)
-                        .font(.system(size: 10, weight: .heavy))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.filmPrimary)
                 }
 
@@ -199,8 +199,8 @@ struct AdjustmentsSheet: View {
                                     }
                                 }
 
-                                Text(skin.displayName)
-                                    .font(.system(size: 11, weight: isSelected ? .bold : .medium))
+                                Text(skin.displayName.capitalized)
+                                    .font(.system(size: 11, weight: isSelected ? .bold : .medium, design: .rounded))
                                     .foregroundStyle(isSelected ? Color.filmPrimary : Color.white)
                                     .multilineTextAlignment(.center)
                                     .lineLimit(1)
@@ -236,7 +236,7 @@ struct AdjustmentsSheet: View {
                 VStack(spacing: 14) {
                     // Frame Ratio
                     HStack {
-                        Text("ASPECT RATIO")
+                        Text("Aspect Ratio")
                             .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(white: 0.7))
                         Spacer()
@@ -251,7 +251,7 @@ struct AdjustmentsSheet: View {
                                     }
                                 } label: {
                                     Text(mode.rawValue)
-                                        .font(.system(size: 12, weight: .bold).monospacedDigit())
+                                        .font(.system(size: 12, weight: .bold, design: .rounded))
                                         .foregroundStyle(isSel ? .black : Color(white: 0.8))
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
@@ -267,7 +267,7 @@ struct AdjustmentsSheet: View {
 
                     // Grid Lines Toggle
                     HStack {
-                        Label("GRID LINES", systemImage: "grid")
+                        Label("Grid Lines", systemImage: "grid")
                             .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(white: 0.7))
                         Spacer()
@@ -280,7 +280,7 @@ struct AdjustmentsSheet: View {
 
                     // Level / Horizon Balance Toggle
                     HStack {
-                        Label("LEVEL / HORIZON BALANCE", systemImage: "water.waves")
+                        Label("Level / Horizon Balance", systemImage: "water.waves")
                             .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color(white: 0.7))
                         Spacer()
