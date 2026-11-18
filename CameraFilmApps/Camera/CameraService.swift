@@ -297,7 +297,7 @@ nonisolated final class CameraService: NSObject, @unchecked Sendable, AVCaptureV
 
     /// - Parameter rotationAngle: the device's horizon-level capture angle, written
     ///   to the photo's orientation metadata.
-    func capturePhoto(flash: AVCaptureDevice.FlashMode, rotationAngle: CGFloat?) async throws -> CapturedPhoto {
+    func capturePhoto(flash: AVCaptureDevice.FlashMode, rotationAngle: CGFloat?, onWillCapture: (@Sendable () -> Void)? = nil) async throws -> CapturedPhoto {
         try await withCheckedThrowingContinuation { continuation in
             sessionQueue.async {
                 // Ensure torch is off before photo capture starts
@@ -336,7 +336,7 @@ nonisolated final class CameraService: NSObject, @unchecked Sendable, AVCaptureV
 
                 let id = settings.uniqueID
                 // The delegate is retained until the capture finishes, then released here.
-                let delegate = PhotoCaptureDelegate(continuation: continuation) {
+                let delegate = PhotoCaptureDelegate(continuation: continuation, onWillCapture: onWillCapture) {
                     self.lock.withLock { _ = self.inFlightCaptures.removeValue(forKey: id) }
                 }
                 self.lock.withLock { self.inFlightCaptures[id] = delegate }
@@ -364,12 +364,18 @@ nonisolated final class CameraService: NSObject, @unchecked Sendable, AVCaptureV
 /// Holds the continuation for one in-flight photo capture.
 nonisolated private final class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate, @unchecked Sendable {
     private let continuation: CheckedContinuation<CapturedPhoto, Error>
+    private let onWillCapture: (@Sendable () -> Void)?
     private let onFinish: () -> Void
     private var result: Result<CapturedPhoto, Error> = .failure(CameraError.noPhotoData)
 
-    init(continuation: CheckedContinuation<CapturedPhoto, Error>, onFinish: @escaping () -> Void) {
+    init(continuation: CheckedContinuation<CapturedPhoto, Error>, onWillCapture: (@Sendable () -> Void)? = nil, onFinish: @escaping () -> Void) {
         self.continuation = continuation
+        self.onWillCapture = onWillCapture
         self.onFinish = onFinish
+    }
+
+    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        onWillCapture?()
     }
 
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {

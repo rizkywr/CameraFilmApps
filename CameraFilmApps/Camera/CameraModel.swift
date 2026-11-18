@@ -428,7 +428,6 @@ final class CameraModel {
         guard !isCapturing, let renderer else { return }
         isCapturing = true
         shutterCount += 1
-        ShutterSoundService.shared.playShutterEffect()
         defer { isCapturing = false }
 
         do {
@@ -452,12 +451,20 @@ final class CameraModel {
     private func capturePhoto() async throws -> CapturedPhoto {
         #if targetEnvironment(simulator)
         guard let frame = simulatorFrame else { throw CameraError.noCamera }
+        ShutterSoundService.shared.playShutterEffect()
         return CapturedPhoto(pixelBuffer: frame, metadata: [:])
         #else
+        // Play shutter sound at the exact millisecond the optical shutter/flash fires
+        let onWillCapture: @Sendable () -> Void = {
+            DispatchQueue.main.async {
+                ShutterSoundService.shared.playShutterEffect()
+            }
+        }
         // Always capture in portrait orientation to match the locked portrait UI
         let captureAngle = rotationCoordinator?.videoRotationAngleForHorizonLevelPreview
         return try await service.capturePhoto(flash: flashMode.avMode,
-                                              rotationAngle: captureAngle)
+                                              rotationAngle: captureAngle,
+                                              onWillCapture: onWillCapture)
         #endif
     }
 
