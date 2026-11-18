@@ -62,34 +62,19 @@ struct FilmLibraryView: View {
                         confirmsDownloadAll = true
                     } label: {
                         Text("IMPORT ALL")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .font(.system(size: 12, weight: .heavy))
                             .foregroundStyle(Color.filmPrimary)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.white.opacity(0.12))
-                            )
                     }
-                    .buttonStyle(.plain)
                     .disabled(library.notYetDownloaded(filteredFilms).isEmpty)
-                    .opacity(library.notYetDownloaded(filteredFilms).isEmpty ? 0.4 : 1.0)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button {
                         dismiss()
                     } label: {
                         Text("DONE")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .font(.system(size: 12, weight: .heavy))
                             .foregroundStyle(Color.filmPrimary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 5)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.white.opacity(0.12))
-                            )
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .confirmationDialog(
