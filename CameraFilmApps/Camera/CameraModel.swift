@@ -381,28 +381,8 @@ final class CameraModel {
                 guard self.isTimerCountingDown && !Task.isCancelled else { return }
                 self.timerCountdown = remaining
 
-                if remaining > 3 {
-                    // Steady 1 flash per second (150ms ON, 850ms OFF = 1000ms)
-                    await self.flashTorchAndHint(onMs: 150, offMs: 850, isFinalRapid: false)
-                } else if remaining == 3 {
-                    // Accelerated blinking: 2 pulses in 1 second
-                    await self.flashTorchAndHint(onMs: 120, offMs: 180, isFinalRapid: false)
-                    guard self.isTimerCountingDown && !Task.isCancelled else { return }
-                    await self.flashTorchAndHint(onMs: 120, offMs: 580, isFinalRapid: false)
-                } else if remaining == 2 {
-                    // Faster blinking: 3 pulses in 1 second
-                    await self.flashTorchAndHint(onMs: 100, offMs: 150, isFinalRapid: false)
-                    guard self.isTimerCountingDown && !Task.isCancelled else { return }
-                    await self.flashTorchAndHint(onMs: 100, offMs: 150, isFinalRapid: false)
-                    guard self.isTimerCountingDown && !Task.isCancelled else { return }
-                    await self.flashTorchAndHint(onMs: 100, offMs: 400, isFinalRapid: false)
-                } else if remaining == 1 {
-                    // Final 1 second: Rapid strobe pulses leading right to shutter release!
-                    for _ in 0..<5 {
-                        guard self.isTimerCountingDown && !Task.isCancelled else { return }
-                        await self.flashTorchAndHint(onMs: 80, offMs: 120, isFinalRapid: true)
-                    }
-                }
+                // Simple 1x flash per second (120ms flash ON, 880ms OFF)
+                await self.flashTorchOnce()
 
                 remaining -= 1
             }
@@ -417,23 +397,20 @@ final class CameraModel {
     }
 
     @MainActor
-    private func flashTorchAndHint(onMs: Int, offMs: Int, isFinalRapid: Bool) async {
+    private func flashTorchOnce() async {
         guard isTimerCountingDown && !Task.isCancelled else { return }
 
+        // Clean 1x torch flash & tick at the start of each countdown second
         service.setTorch(on: true)
-        withAnimation(.easeOut(duration: Double(onMs) / 1000.0 * 0.5)) {
-            isTorchPulsing = true
-        }
-        ShutterSoundService.shared.playTimerTick(isFinalRapid: isFinalRapid)
+        isTorchPulsing = true
+        ShutterSoundService.shared.playTimerTick(isFinalRapid: false)
 
-        try? await Task.sleep(for: .milliseconds(onMs))
+        try? await Task.sleep(for: .milliseconds(120))
 
         service.setTorch(on: false)
-        withAnimation(.easeOut(duration: Double(offMs) / 1000.0 * 0.5)) {
-            isTorchPulsing = false
-        }
+        isTorchPulsing = false
 
-        try? await Task.sleep(for: .milliseconds(offMs))
+        try? await Task.sleep(for: .milliseconds(880))
     }
 
     private func executeCapture() async {
