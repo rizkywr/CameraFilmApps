@@ -48,11 +48,11 @@ struct RollPhotoDetailView: View {
                         ) {
                             Image(uiImage: image)
                                 .resizable()
-                                .scaledToFill()
+                                .scaledToFit()
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 6))
                         .shadow(color: .black.opacity(0.85), radius: 16, x: 0, y: 8)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                         .padding(.vertical, 12)
                     } else {
                         ProgressView()
