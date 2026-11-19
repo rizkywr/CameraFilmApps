@@ -71,8 +71,8 @@ struct VintageHardwareButton: View {
                     }
                     if let subtext {
                         Text(subtext)
-                            .font(.system(size: 7, weight: .bold))
-                            .foregroundStyle(isActive ? Color.filmPrimary : Color.white.opacity(0.7))
+                            .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                            .foregroundStyle(isActive ? Color.filmPrimary : Color.white.opacity(0.85))
                     }
                 }
             }
@@ -203,8 +203,8 @@ struct VintageHardwareButtonFace: View {
                 }
                 if let subtext {
                     Text(subtext)
-                        .font(.system(size: 7, weight: .bold))
-                        .foregroundStyle(isActive ? Color.filmPrimary : Color.white.opacity(0.7))
+                        .font(.system(size: 9.5, weight: .heavy, design: .rounded))
+                        .foregroundStyle(isActive ? Color.filmPrimary : Color.white.opacity(0.85))
                 }
             }
         }
