@@ -193,29 +193,29 @@ struct AdjustmentsSheet: View {
                             }
                         } label: {
                             VStack(spacing: 8) {
-                                // Real leather preview circle with chrome ring
+                                // Real leather preview rounded rectangle with chrome vintage bezel
                                 ZStack {
-                                    Circle()
+                                    RoundedRectangle(cornerRadius: 12)
                                         .fill(skin.baseColor)
-                                        .frame(width: 48, height: 48)
+                                        .frame(width: 54, height: 44)
                                         .overlay(
-                                            Circle()
+                                            RoundedRectangle(cornerRadius: 12)
                                                 .strokeBorder(
                                                     LinearGradient(
                                                         colors: isSelected
                                                             ? [Color.filmPrimary, Color.white]
-                                                            : [Color.white.opacity(0.3), Color.black.opacity(0.6)],
+                                                            : [Color.white.opacity(0.35), Color.black.opacity(0.6)],
                                                         startPoint: .topLeading,
                                                         endPoint: .bottomTrailing
                                                     ),
-                                                    lineWidth: isSelected ? 3 : 1.5
+                                                    lineWidth: isSelected ? 2.5 : 1.5
                                                 )
                                         )
                                         .shadow(color: isSelected ? Color.filmPrimary.opacity(0.6) : .black.opacity(0.4), radius: isSelected ? 6 : 3)
 
                                     if isSelected {
                                         Image(systemName: "checkmark")
-                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                            .font(.system(size: 15, weight: .bold, design: .rounded))
                                             .foregroundStyle(.white)
                                             .shadow(color: .black.opacity(0.8), radius: 2)
                                     }
