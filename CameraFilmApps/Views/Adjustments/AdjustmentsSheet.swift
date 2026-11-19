@@ -480,14 +480,14 @@ private struct AnalogAdjustmentRow: View {
                         .opacity(0.85)
 
                     // Native slider layered seamlessly on top
-                    Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : nil) {
+                    Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : (control.id == "intensity" ? 1 : nil)) {
                         Text(control.title)
                     }
                     .tint(.clear)
                     .labelsHidden()
                 }
             } else {
-                Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : nil) {
+                Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : (control.id == "intensity" ? 1 : nil)) {
                     Text(control.title)
                 }
                 .tint(Color.filmPrimary)
