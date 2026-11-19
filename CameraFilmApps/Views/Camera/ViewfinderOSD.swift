@@ -71,17 +71,12 @@ struct ViewfinderOSD: View {
                 // Film simulation badge (tap to open film library)
                 Button(action: onFilmTap) {
                     let film = library.film(id: camera.selectedFilmID)
-                    HStack(spacing: 5) {
-                        FilmCanisterIconView(isSelected: true)
-                            .scaleEffect(0.68)
-                            .frame(width: 16, height: 16)
-                        Text(film?.displayName ?? "Original")
-                            .font(.system(size: 11, weight: .semibold))
-                            .lineLimit(1)
-                            .foregroundStyle(.white)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    Text(film?.displayName ?? "Original")
+                        .font(.system(size: 11, weight: .semibold))
+                        .lineLimit(1)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                     .background(Color.black.opacity(0.6))
                     .clipShape(.rect(cornerRadius: 6))
                     .overlay(
