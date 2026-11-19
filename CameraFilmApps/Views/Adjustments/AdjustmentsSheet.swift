@@ -76,8 +76,12 @@ struct AdjustmentsSheet: View {
                                     }
                                 } label: {
                                     HStack(spacing: 6) {
-                                        Image(systemName: tab.icon)
-                                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                                        if tab == .skin {
+                                            AnalogCameraIconView(isSelected: isSelected, size: 14)
+                                        } else {
+                                            Image(systemName: tab.icon)
+                                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                        }
                                         Text(tab.title(using: langManager))
                                             .font(.system(size: 12, weight: .bold, design: .rounded))
                                             .tracking(0.5)
@@ -166,8 +170,9 @@ struct AdjustmentsSheet: View {
     private var cameraSkinSection: some View {
         analogCard {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Label("Body Leather Skin", systemImage: "camera.macro")
+                HStack(spacing: 8) {
+                    AnalogCameraIconView(isSelected: true, size: 14)
+                    Text("Body Leather Skin")
                         .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(white: 0.7))
                     Spacer()
