@@ -37,23 +37,16 @@ struct RollPhotoDetailView: View {
                 // Top Vintage Navigation Bar
                 topBar
 
-                // Center: High-Resolution Photo Display with Authentic 35mm Filmstrip Frame
+                // Center: High-Resolution Clean Photo Display (No frame, clean full preview)
                 ZStack {
                     if let image {
-                        let frameIdx = (rollStore.photos.firstIndex(where: { $0.id == photo.id }) ?? 0) + 1
-                        FilmstripFrameView(
-                            filmName: photo.filmName,
-                            frameNumber: frameIdx,
-                            isDetailView: true
-                        ) {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .shadow(color: .black.opacity(0.85), radius: 16, x: 0, y: 8)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .shadow(color: .black.opacity(0.7), radius: 12, x: 0, y: 6)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                     } else {
                         ProgressView()
                             .tint(Color.filmPrimary)
