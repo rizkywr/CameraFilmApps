@@ -66,7 +66,7 @@ struct VintageHardwareButton: View {
                     }
                     if let text {
                         Text(text)
-                            .font(.system(size: 10, weight: .heavy))
+                            .font(.system(size: 10, weight: .heavy, design: .rounded))
                             .foregroundStyle(isActive ? Color.filmPrimary : Color(white: 0.85))
                     }
                     if let subtext {
@@ -124,7 +124,7 @@ struct VintageSalmonButton: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
                     Text(title)
-                        .font(.system(size: 7, weight: .black))
+                        .font(.system(size: 7, weight: .black, design: .rounded))
                         .tracking(0.5)
                         .foregroundStyle(.white)
                 }
@@ -198,7 +198,7 @@ struct VintageHardwareButtonFace: View {
                 }
                 if let text {
                     Text(text)
-                        .font(.system(size: 10, weight: .heavy))
+                        .font(.system(size: 10, weight: .heavy, design: .rounded))
                         .foregroundStyle(isActive ? Color.filmPrimary : Color(white: 0.85))
                 }
                 if let subtext {
