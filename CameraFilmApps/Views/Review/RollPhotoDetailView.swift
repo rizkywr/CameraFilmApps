@@ -48,7 +48,7 @@ struct RollPhotoDetailView: View {
                         ) {
                             Image(uiImage: image)
                                 .resizable()
-                                .scaledToFit()
+                                .scaledToFill()
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 6))
                         .shadow(color: .black.opacity(0.85), radius: 16, x: 0, y: 8)

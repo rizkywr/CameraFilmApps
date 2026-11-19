@@ -6,7 +6,7 @@
 import SwiftUI
 
 /// Authentic 35mm continuous negative filmstrip frame featuring precision-aligned side sprocket perforations,
-/// edge DX barcode markings, and exposure numbering without any clipping.
+/// edge DX barcode markings, and legible exposure numbering without any blank space or photo clipping.
 struct FilmstripFrameView<Content: View>: View {
     let filmName: String
     let frameNumber: Int
@@ -14,15 +14,15 @@ struct FilmstripFrameView<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     private var marginWidth: CGFloat {
-        isDetailView ? 28 : 22
+        isDetailView ? 30 : 22
     }
 
     private var sprocketWidth: CGFloat {
-        isDetailView ? 8.5 : 7
+        isDetailView ? 9 : 7
     }
 
     private var sprocketHeight: CGFloat {
-        isDetailView ? 12 : 9.5
+        isDetailView ? 13 : 10
     }
 
     private var sprocketCount: Int {
@@ -34,7 +34,7 @@ struct FilmstripFrameView<Content: View>: View {
             // Left margin with sprocket holes & frame number / film name
             leftMargin
 
-            // Photo frame (preserves aspect ratio without being cropped)
+            // Photo frame (scaled to fill frame so no black bars/space at bottom)
             ZStack {
                 Color.black
                 content()
@@ -69,18 +69,18 @@ struct FilmstripFrameView<Content: View>: View {
 
                     if idx == 1 {
                         Text(filmName.uppercased())
-                            .font(.system(size: isDetailView ? 5.5 : 4.5, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.9))
+                            .font(.system(size: isDetailView ? 8.5 : 7, weight: .black, design: .rounded))
+                            .foregroundStyle(Color(red: 0.95, green: 0.68, blue: 0.25))
                             .rotationEffect(.degrees(-90))
                             .fixedSize()
-                            .frame(width: 8, height: isDetailView ? 16 : 12)
+                            .frame(width: isDetailView ? 14 : 10, height: isDetailView ? 24 : 18)
                     } else if idx == (sprocketCount - 2) {
                         Text(String(format: "%02dA", frameNumber))
-                            .font(.system(size: isDetailView ? 6 : 5, weight: .heavy, design: .monospaced))
-                            .foregroundStyle(Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.9))
+                            .font(.system(size: isDetailView ? 9 : 7.5, weight: .heavy, design: .monospaced))
+                            .foregroundStyle(Color(red: 0.95, green: 0.68, blue: 0.25))
                             .rotationEffect(.degrees(-90))
                             .fixedSize()
-                            .frame(width: 8, height: isDetailView ? 14 : 10)
+                            .frame(width: isDetailView ? 14 : 10, height: isDetailView ? 20 : 14)
                     } else {
                         Spacer().frame(height: isDetailView ? 10 : 6)
                     }
@@ -103,21 +103,21 @@ struct FilmstripFrameView<Content: View>: View {
 
                     if idx == 2 {
                         // Simulated optical DX barcode lines
-                        VStack(spacing: 1.2) {
+                        VStack(spacing: 1.5) {
                             ForEach(0..<4, id: \.self) { bar in
                                 Rectangle()
-                                    .fill(Color(white: 0.6).opacity(0.8))
-                                    .frame(width: bar % 2 == 0 ? (isDetailView ? 9 : 7) : (isDetailView ? 5 : 4), height: 1)
+                                    .fill(Color(white: 0.65).opacity(0.85))
+                                    .frame(width: bar % 2 == 0 ? (isDetailView ? 11 : 8) : (isDetailView ? 6 : 5), height: 1.2)
                             }
                         }
-                        .frame(height: isDetailView ? 14 : 10)
+                        .frame(height: isDetailView ? 16 : 12)
                     } else if idx == (sprocketCount - 2) {
                         Text("▶ \(frameNumber)")
-                            .font(.system(size: isDetailView ? 6 : 5, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.85))
+                            .font(.system(size: isDetailView ? 9 : 7.5, weight: .heavy, design: .monospaced))
+                            .foregroundStyle(Color(red: 0.95, green: 0.68, blue: 0.25))
                             .rotationEffect(.degrees(-90))
                             .fixedSize()
-                            .frame(width: 8, height: isDetailView ? 14 : 10)
+                            .frame(width: isDetailView ? 14 : 10, height: isDetailView ? 20 : 14)
                     } else {
                         Spacer().frame(height: isDetailView ? 10 : 6)
                     }
@@ -133,11 +133,11 @@ struct FilmstripFrameView<Content: View>: View {
     // MARK: - Sprocket Hole
 
     private var sprocketHole: some View {
-        RoundedRectangle(cornerRadius: 1.5)
+        RoundedRectangle(cornerRadius: 1.6)
             .fill(Color(white: 0.16))
             .overlay(
-                RoundedRectangle(cornerRadius: 1.5)
-                    .strokeBorder(Color.black.opacity(0.9), lineWidth: 0.7)
+                RoundedRectangle(cornerRadius: 1.6)
+                    .strokeBorder(Color.black.opacity(0.9), lineWidth: 0.8)
             )
             .frame(width: sprocketWidth, height: sprocketHeight)
     }

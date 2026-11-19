@@ -263,7 +263,7 @@ struct FilmRollReviewView: View {
                     if let thumb = rollStore.thumbnail(for: photo) {
                         Image(uiImage: thumb)
                             .resizable()
-                            .scaledToFit()
+                            .scaledToFill()
                     } else {
                         Color(white: 0.15)
                             .overlay {
