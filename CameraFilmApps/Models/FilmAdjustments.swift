@@ -54,7 +54,7 @@ struct AdjustmentControl: Identifiable {
     }
 
     static let all: [AdjustmentControl] = [
-        .init(id: "intensity", title: "Film Strength", systemImage: "film", group: .film, range: 0...2, keyPath: \.lutIntensity),
+        .init(id: "intensity", title: "Film Strength", systemImage: "film", group: .film, range: 0...1, keyPath: \.lutIntensity),
         .init(id: "exposure", title: "Exposure", systemImage: "plusminus.circle", group: .light, range: -2...2, keyPath: \.exposure),
         .init(id: "contrast", title: "Contrast", systemImage: "circle.lefthalf.filled", group: .light, range: -1...1, keyPath: \.contrast),
         .init(id: "highlights", title: "Highlights", systemImage: "sun.max", group: .light, range: -1...1, keyPath: \.highlights),

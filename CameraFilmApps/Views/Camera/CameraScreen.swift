@@ -184,9 +184,8 @@ struct CameraScreen: View {
                             } else {
                                 Color.filmSurfaceContainerHigh
                                     .overlay {
-                                        Image(systemName: "film.stack")
-                                            .font(.system(size: 20))
-                                            .foregroundStyle(.secondary)
+                                        FilmCanisterIconView(isSelected: true)
+                                            .scaleEffect(1.1)
                                     }
                             }
                         }

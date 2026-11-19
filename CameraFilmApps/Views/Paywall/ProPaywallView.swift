@@ -158,11 +158,22 @@ struct ProPaywallView: View {
 
     private var featuresList: some View {
         VStack(spacing: 14) {
-            featureRow(
-                icon: "film.stack.fill",
-                title: langManager.text(.allAnalogFilms),
-                subtitle: langManager.text(.allAnalogFilmsDesc)
-            )
+            HStack(alignment: .top, spacing: 14) {
+                FilmCanisterIconView(isSelected: true)
+                    .scaleEffect(0.95)
+                    .frame(width: 24, height: 24)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(langManager.text(.allAnalogFilms))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+
+                    Text(langManager.text(.allAnalogFilmsDesc))
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color.white.opacity(0.65))
+                }
+                Spacer()
+            }
             featureRow(
                 icon: "rectangle.split.3x1",
                 title: langManager.text(.filmstripBorders),

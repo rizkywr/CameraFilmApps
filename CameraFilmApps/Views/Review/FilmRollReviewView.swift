@@ -373,9 +373,9 @@ struct FilmRollReviewView: View {
                     .frame(width: 100, height: 100)
                     .overlay(Circle().strokeBorder(Color.white.opacity(0.15), lineWidth: 1.5))
 
-                Image(systemName: "film.stack")
-                    .font(.system(size: 42))
-                    .foregroundStyle(Color.filmPrimary)
+                FilmCanisterIconView(isSelected: true)
+                    .scaleEffect(2.2)
+                    .frame(width: 52, height: 48)
             }
 
             Text(langManager.text(.noFramesCaptured))

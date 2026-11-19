@@ -78,6 +78,10 @@ struct AdjustmentsSheet: View {
                                     HStack(spacing: 6) {
                                         if tab == .skin {
                                             AnalogCameraIconView(isSelected: isSelected, size: 14)
+                                        } else if tab == .film {
+                                            FilmCanisterIconView(isSelected: isSelected)
+                                                .scaleEffect(0.68)
+                                                .frame(width: 16, height: 16)
                                         } else {
                                             Image(systemName: tab.icon)
                                                 .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -444,9 +448,15 @@ private struct AnalogAdjustmentRow: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 HStack(spacing: 6) {
-                    Image(systemName: control.systemImage)
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundStyle(iconColor)
+                    if control.id == "intensity" {
+                        FilmCanisterIconView(isSelected: true)
+                            .scaleEffect(0.65)
+                            .frame(width: 14, height: 14)
+                    } else {
+                        Image(systemName: control.systemImage)
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(iconColor)
+                    }
 
                     Text(control.title.capitalized)
                         .font(.system(size: 11, weight: .bold, design: .rounded))
@@ -480,14 +490,14 @@ private struct AnalogAdjustmentRow: View {
                         .opacity(0.85)
 
                     // Native slider layered seamlessly on top
-                    Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : (control.id == "intensity" ? 1 : nil)) {
+                    Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : nil) {
                         Text(control.title)
                     }
                     .tint(.clear)
                     .labelsHidden()
                 }
             } else {
-                Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : (control.id == "intensity" ? 1 : nil)) {
+                Slider(value: $value, in: control.range, neutralValue: control.isBipolar ? 0 : nil) {
                     Text(control.title)
                 }
                 .tint(Color.filmPrimary)

@@ -78,12 +78,7 @@ kernel void filmGrade(texture2d<float, access::read>   source [[texture(0)]],
         float n = u.lutSize;
         float3 coord = normalized * ((n - 1.0) / n) + 0.5 / n;
         float3 filmic = lut.sample(lutSampler, coord).rgb;
-        if (u.lutIntensity <= 1.0) {
-            c = mix(c, filmic, u.lutIntensity);
-        } else {
-            // Extrapolate beyond 1.0 up to 2.0 (boost film characteristic curve)
-            c = saturate(filmic + (filmic - c) * (u.lutIntensity - 1.0));
-        }
+        c = mix(c, filmic, u.lutIntensity);
     }
 
     // Highlights / shadows: luminance-weighted lift or pull.

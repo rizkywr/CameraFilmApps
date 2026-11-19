@@ -208,7 +208,13 @@ struct FilmLibraryView: View {
         .overlay {
             if library.myFilms.isEmpty {
                 ContentUnavailableView {
-                    Label("No Films In Vault", systemImage: "film.stack")
+                    VStack(spacing: 8) {
+                        FilmCanisterIconView(isSelected: true)
+                            .scaleEffect(1.6)
+                            .frame(width: 44, height: 44)
+                        Text("No Films In Vault")
+                            .font(.system(size: 17, weight: .bold))
+                    }
                 } description: {
                     Text("Import films from Rolls Film to load them into your analog camera.")
                 } actions: {
