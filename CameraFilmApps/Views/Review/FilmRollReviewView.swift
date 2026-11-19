@@ -17,6 +17,7 @@ struct FilmRollReviewView: View {
     @State private var isSavingBatch = false
     @State private var showDeleteConfirmation = false
     @State private var toastMessage: String?
+    private var langManager = LanguageManager.shared
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -136,7 +137,7 @@ struct FilmRollReviewView: View {
                 generator.impactOccurred()
                 dismiss()
             } label: {
-                Text("Close")
+                Text(langManager.text(.close))
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
@@ -151,11 +152,11 @@ struct FilmRollReviewView: View {
 
             // Center Title
             VStack(spacing: 2) {
-                Text("Film Roll Review")
+                Text(langManager.text(.filmRollReview))
                     .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.filmPrimary)
 
-                Text(isSelectionMode ? "\(selectedIDs.count) Of \(rollStore.photos.count) Selected" : "Roll #01 • \(rollStore.photos.count) Frames")
+                Text(isSelectionMode ? "\(selectedIDs.count) / \(rollStore.photos.count)" : langManager.text(.rollFrames(rollStore.photos.count)))
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(white: 0.65))
             }
@@ -174,7 +175,7 @@ struct FilmRollReviewView: View {
                         }
                     }
                 } label: {
-                    Text(isSelectionMode ? "Done" : "Select")
+                    Text(isSelectionMode ? langManager.text(.done) : langManager.text(.select))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(isSelectionMode ? Color(white: 0.9) : Color.filmPrimary)
                         .padding(.horizontal, 14)
@@ -281,7 +282,7 @@ struct FilmRollReviewView: View {
                                 HStack(spacing: 3) {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 8, weight: .bold))
-                                    Text("Saved")
+                                    Text(langManager.text(.saved))
                                         .font(.system(size: 8, weight: .bold, design: .rounded))
                                 }
                                 .foregroundStyle(Color.green)
@@ -377,11 +378,11 @@ struct FilmRollReviewView: View {
                     .foregroundStyle(Color.filmPrimary)
             }
 
-            Text("No Frames Captured")
+            Text(langManager.text(.noFramesCaptured))
                 .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
 
-            Text("Photos taken with the camera will appear here on your film roll.")
+            Text(langManager.text(.noFramesDesc))
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(Color(white: 0.65))
                 .multilineTextAlignment(.center)
@@ -410,7 +411,7 @@ struct FilmRollReviewView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 13, weight: .bold))
-                    Text(isAll ? "Delete All" : "Delete")
+                    Text(isAll ? langManager.text(.deleteAll) : langManager.text(.delete))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                 }
                 .foregroundStyle(hasSelection ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color.white.opacity(0.3))
@@ -468,7 +469,7 @@ struct FilmRollReviewView: View {
                     } else {
                         Image(systemName: "square.and.arrow.down.fill")
                             .font(.system(size: 14, weight: .bold, design: .rounded))
-                        Text(isAll ? "Save All" : "Save")
+                        Text(isAll ? langManager.text(.saveAll) : langManager.text(.save))
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                     }
                 }

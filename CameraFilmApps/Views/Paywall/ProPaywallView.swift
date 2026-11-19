@@ -6,55 +6,50 @@
 import SwiftUI
 import StoreKit
 
-/// Full-screen vintage analog themed Paywall for Film Camera PRO.
+/// Full-screen Pro upgrade paywall displaying authentic analog film features and subscriptions.
 struct ProPaywallView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var proStore = ProStore.shared
+    @Environment(ProStore.self) private var proStore
+    private var langManager = LanguageManager.shared
+
     @State private var selectedPlan: ProPlanType = .lifetime
 
     var body: some View {
         ZStack {
-            // Retro Darkroom textured background
+            // Dark analog camera body aesthetic
             Color(red: 0.08, green: 0.08, blue: 0.09)
                 .ignoresSafeArea()
 
-            // Subtle warm analog golden glow from top
-            RadialGradient(
-                colors: [
-                    Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.18),
-                    Color.clear
-                ],
-                center: .top,
-                startRadius: 20,
-                endRadius: 400
-            )
-            .ignoresSafeArea()
+            VStack(spacing: 0) {
+                // Header Bar
+                headerBar
 
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 24) {
-                    // Header & Close Button
-                    headerSection
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 22) {
+                        // Quota limit banner (if shots exhausted)
+                        if proStore.remainingFreeShots <= 0 {
+                            quotaExceededBanner
+                        }
 
-                    // Quota notification if user hit 3-shot limit
-                    if proStore.totalCapturedCount >= ProStore.maxFreeShots {
-                        quotaReachedBanner
+                        // Hero Visuals
+                        heroSection
+
+                        // Features List
+                        featuresList
+
+                        // Plan Selector
+                        plansSelectionView
+
+                        // Main CTA Purchase Button
+                        actionButton
+
+                        // Terms & Restore Purchases
+                        footerView
                     }
-
-                    // Feature highlights list
-                    featuresList
-
-                    // Plan selection cards
-                    plansSelectionView
-
-                    // Main Action CTA Button
-                    actionButton
-
-                    // Footer links
-                    footerView
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 36)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 36)
             }
         }
         .onChange(of: proStore.isPro) { _, isPro in
@@ -64,125 +59,119 @@ struct ProPaywallView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Header Bar
 
-    private var headerSection: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Spacer()
-                Button {
-                    let impact = UIImpactFeedbackGenerator(style: .light)
-                    impact.impactOccurred()
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Color.white.opacity(0.7))
-                        .frame(width: 32, height: 32)
-                        .background(Color.white.opacity(0.12))
-                        .clipShape(Circle())
-                }
+    private var headerBar: some View {
+        HStack {
+            Spacer()
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color.white.opacity(0.7))
+                    .padding(8)
+                    .background(Color.white.opacity(0.12))
+                    .clipShape(Circle())
             }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+        .padding(.bottom, 6)
+    }
 
-            // Golden PRO Badge
+    // MARK: - Quota Banner
+
+    private var quotaExceededBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Color(red: 0.98, green: 0.75, blue: 0.25))
+                .font(.system(size: 16))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(langManager.text(.freeLimitBanner(ProStore.maxFreeShots)))
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text(langManager.text(.unlimitedShooting))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color.white.opacity(0.75))
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color(red: 0.25, green: 0.16, blue: 0.05).opacity(0.9))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.5), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Hero Section
+
+    private var heroSection: some View {
+        VStack(spacing: 10) {
             ZStack {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [
-                                Color(red: 0.95, green: 0.72, blue: 0.35),
-                                Color(red: 0.70, green: 0.45, blue: 0.15)
-                            ],
+                            colors: [Color(red: 0.95, green: 0.72, blue: 0.35).opacity(0.3), .clear],
                             center: .center,
                             startRadius: 10,
-                            endRadius: 36
+                            endRadius: 50
                         )
                     )
-                    .frame(width: 68, height: 68)
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color.white.opacity(0.5), lineWidth: 1.5)
-                    )
-                    .shadow(color: Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.5), radius: 16)
+                    .frame(width: 90, height: 90)
 
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(Color.black.opacity(0.85))
+                    .font(.system(size: 42))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 1.0, green: 0.85, blue: 0.45),
+                                Color(red: 0.95, green: 0.65, blue: 0.25)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.5), radius: 8, y: 3)
             }
 
-            Text("Film Camera Pro")
-                .font(.system(size: 26, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.white, Color(white: 0.85)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .tracking(1.5)
+            Text(langManager.text(.unlockFilmPro))
+                .font(.system(size: 24, weight: .heavy, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
 
-            Text("Capture authentic analog memories with unlimited film stocks and master-level controls.")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(Color.white.opacity(0.75))
+            Text(langManager.text(.unlimitedShooting))
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(Color.white.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 16)
         }
     }
 
-    // MARK: - Quota Banner
-
-    private var quotaReachedBanner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "film.stack")
-                .font(.system(size: 22))
-                .foregroundStyle(Color(red: 0.95, green: 0.72, blue: 0.35))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Free Limit Reached (25/25)")
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text("Kamu sudah menggunakan 25 kali jepret gratis. Upgrade ke Pro untuk menikmati foto analog tanpa batas!")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color.white.opacity(0.8))
-            }
-
-            Spacer()
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.95, green: 0.65, blue: 0.25).opacity(0.15))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color(red: 0.95, green: 0.72, blue: 0.35).opacity(0.5), lineWidth: 1)
-                )
-        )
-    }
-
     // MARK: - Features List
 
     private var featuresList: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             featureRow(
-                icon: "infinity",
-                title: "Unlimited Film Captures",
-                subtitle: "Nikmati jepretan tanpa batas selamanya tanpa batasan 25 foto."
+                icon: "film.stack.fill",
+                title: langManager.text(.allAnalogFilms),
+                subtitle: langManager.text(.allAnalogFilmsDesc)
             )
             featureRow(
-                icon: "film",
-                title: "All 200+ Authentic Film Stocks",
-                subtitle: "Full library of Kodak Portra, Tri-X, Velvia, Ektachrome & more."
-            )
-            featureRow(
-                icon: "slider.horizontal.3",
-                title: "Full Analog Adjustments",
-                subtitle: "Fine-tune halation bloom, grain size, warmth, and contrast."
+                icon: "rectangle.split.3x1",
+                title: langManager.text(.filmstripBorders),
+                subtitle: langManager.text(.filmstripBordersDesc)
             )
             featureRow(
                 icon: "sparkles",
-                title: "Maximum HD & RAW Quality",
-                subtitle: "Save full sensor resolution with preserved analog grain detail."
+                title: langManager.text(.maxHdQuality),
+                subtitle: langManager.text(.maxHdQualityDesc)
             )
         }
         .padding(16)
@@ -248,11 +237,11 @@ struct ProPaywallView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 8) {
-                        Text(plan.title)
+                        Text(plan.title(using: langManager))
                             .font(.system(size: 15, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
 
-                        if let badge = plan.badge {
+                        if let badge = plan.badge(using: langManager) {
                             Text(badge)
                                 .font(.system(size: 9, weight: .bold, design: .rounded))
                                 .foregroundStyle(.black)
@@ -263,14 +252,14 @@ struct ProPaywallView: View {
                         }
                     }
 
-                    Text(plan.subtitle)
+                    Text(plan.subtitle(using: langManager))
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.white.opacity(0.6))
                 }
 
                 Spacer()
 
-                // Price
+                // Price (English default: Rp 99.000 / Rp 19.000 / Month or localized App Store price)
                 let priceText = proStore.products.first(where: { $0.id == plan.rawValue })?.displayPrice ?? plan.defaultPriceString
                 Text(priceText)
                     .font(.system(size: 14, weight: .bold, design: .rounded))
@@ -322,7 +311,7 @@ struct ProPaywallView: View {
                             .tint(.black)
                     } else {
                         HStack(spacing: 8) {
-                            Text("Upgrade To Film Pro")
+                            Text(langManager.text(.upgradeToFilmPro))
                                 .font(.system(size: 16, weight: .heavy, design: .rounded))
                                 .foregroundStyle(Color.black.opacity(0.9))
 
@@ -353,13 +342,13 @@ struct ProPaywallView: View {
                     await proStore.restorePurchases()
                 }
             } label: {
-                Text("Restore Purchases")
+                Text(langManager.text(.restorePurchases))
                     .font(.system(size: 12, weight: .bold, design: .rounded))
             }
             .foregroundStyle(Color.white.opacity(0.7))
             .disabled(proStore.isRestoring)
 
-            Text("Auto-renewable subscriptions can be cancelled anytime in App Store account settings.")
+            Text(langManager.text(.subscriptionTerms))
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(Color.white.opacity(0.4))
                 .multilineTextAlignment(.center)
@@ -388,4 +377,5 @@ struct ProPaywallView: View {
 
 #Preview {
     ProPaywallView()
+        .environment(ProStore.shared)
 }

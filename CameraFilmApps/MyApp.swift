@@ -22,6 +22,7 @@ struct MyApp: App {
     @State private var library = FilmLibrary()
     @State private var rollStore = FilmRollStore.shared
     @State private var proStore = ProStore.shared
+    @State private var langManager = LanguageManager.shared
 
     var body: some Scene {
         WindowGroup {

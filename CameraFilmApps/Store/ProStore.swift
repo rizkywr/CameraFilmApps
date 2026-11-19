@@ -15,31 +15,31 @@ enum ProPlanType: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    func title(using langManager: LanguageManager = .shared) -> String {
         switch self {
-        case .lifetime: "Lifetime Purchase"
-        case .monthly: "Monthly Subscription"
+        case .lifetime: return langManager.text(.lifetimePurchase)
+        case .monthly: return langManager.text(.monthlySubscription)
         }
     }
 
     var defaultPriceString: String {
         switch self {
         case .lifetime: "Rp 99.000"
-        case .monthly: "Rp 19.000 / Bulan"
+        case .monthly: "Rp 19.000 / Month"
         }
     }
 
-    var subtitle: String {
+    func subtitle(using langManager: LanguageManager = .shared) -> String {
         switch self {
-        case .lifetime: "Bayar sekali, miliki selamanya"
-        case .monthly: "Langganan bulanan fleksibel, batalkan kapan saja"
+        case .lifetime: return langManager.text(.lifetimeSubtitle)
+        case .monthly: return langManager.text(.monthlySubtitle)
         }
     }
 
-    var badge: String? {
+    func badge(using langManager: LanguageManager = .shared) -> String? {
         switch self {
-        case .lifetime: "BEST VALUE"
-        case .monthly: nil
+        case .lifetime: return langManager.text(.bestValue)
+        case .monthly: return nil
         }
     }
 }

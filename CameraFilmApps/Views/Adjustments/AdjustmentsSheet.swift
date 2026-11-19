@@ -19,8 +19,21 @@ struct AdjustmentsSheet: View {
         case light = "Light"
         case color = "Color"
         case effects = "Effects"
+        case settings = "Settings"
 
         var id: String { rawValue }
+
+        func title(using lang: LanguageManager = .shared) -> String {
+            switch self {
+            case .skin: return lang.text(.tabSkin)
+            case .frame: return lang.text(.tabFrame)
+            case .film: return lang.text(.tabFilm)
+            case .light: return lang.text(.tabLight)
+            case .color: return lang.text(.tabColor)
+            case .effects: return lang.text(.tabEffects)
+            case .settings: return lang.text(.tabSettings)
+            }
+        }
 
         var icon: String {
             switch self {
@@ -30,6 +43,7 @@ struct AdjustmentsSheet: View {
             case .light: return "sun.max"
             case .color: return "paintpalette"
             case .effects: return "sparkles"
+            case .settings: return "gearshape"
             }
         }
     }
@@ -37,6 +51,7 @@ struct AdjustmentsSheet: View {
     private static let compact = PresentationDetent.fraction(0.42)
     @State private var detent = AdjustmentsSheet.compact
     @State private var selectedTab: EditTab = .skin
+    private var langManager = LanguageManager.shared
 
     var body: some View {
         @Bindable var camera = camera
@@ -63,7 +78,7 @@ struct AdjustmentsSheet: View {
                                     HStack(spacing: 6) {
                                         Image(systemName: tab.icon)
                                             .font(.system(size: 11, weight: .bold, design: .rounded))
-                                        Text(tab.rawValue)
+                                        Text(tab.title(using: langManager))
                                             .font(.system(size: 12, weight: .bold, design: .rounded))
                                             .tracking(0.5)
                                     }
@@ -103,6 +118,8 @@ struct AdjustmentsSheet: View {
                                 controlsFor(group: .color)
                             case .effects:
                                 controlsFor(group: .effects)
+                            case .settings:
+                                settingsSection
                             }
                         }
                         .padding(.horizontal, 16)
@@ -111,7 +128,7 @@ struct AdjustmentsSheet: View {
                     }
                 }
             }
-            .navigationTitle("Studio Calibration")
+            .navigationTitle(langManager.text(.studioCalibration))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -120,7 +137,7 @@ struct AdjustmentsSheet: View {
                         generator.notificationOccurred(.warning)
                         withAnimation { camera.adjustments = .default }
                     } label: {
-                        Text("Reset")
+                        Text(langManager.text(.reset))
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(camera.adjustments == .default ? Color(white: 0.4) : Color.filmPrimary)
                     }
@@ -132,7 +149,7 @@ struct AdjustmentsSheet: View {
                         generator.impactOccurred()
                         dismiss()
                     } label: {
-                        Text("Done")
+                        Text(langManager.text(.done))
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.filmPrimary)
                     }
@@ -335,6 +352,80 @@ struct AdjustmentsSheet: View {
                 )
         )
         .shadow(color: .black.opacity(0.4), radius: 4, x: 0, y: 2)
+    }
+
+    // MARK: - Settings & Language Section
+
+    private var settingsSection: some View {
+        VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Image(systemName: "globe")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(Color.filmPrimary)
+                    Text(langManager.text(.appLanguage))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
+
+                Text(langManager.text(.selectLanguageDescription))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color.white.opacity(0.6))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
+
+            VStack(spacing: 8) {
+                ForEach(AppLanguage.allCases) { lang in
+                    let isSelected = langManager.currentLanguage == lang
+                    Button {
+                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        generator.impactOccurred()
+                        withAnimation(.spring(duration: 0.2)) {
+                            langManager.currentLanguage = lang
+                        }
+                    } label: {
+                        HStack(spacing: 12) {
+                            Text(lang.flag)
+                                .font(.system(size: 20))
+
+                            Text(lang.displayName)
+                                .font(.system(size: 14, weight: isSelected ? .bold : .medium, design: .rounded))
+                                .foregroundStyle(isSelected ? Color.filmPrimary : .white)
+
+                            if lang == .english {
+                                Text("(Default)")
+                                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                                    .foregroundStyle(Color.white.opacity(0.4))
+                            }
+
+                            Spacer()
+
+                            if isSelected {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 13, weight: .heavy))
+                                    .foregroundStyle(Color.filmPrimary)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(isSelected ? Color.filmPrimary.opacity(0.12) : Color.white.opacity(0.04))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(
+                                            isSelected ? Color.filmPrimary.opacity(0.6) : Color.white.opacity(0.08),
+                                            lineWidth: 1
+                                        )
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
