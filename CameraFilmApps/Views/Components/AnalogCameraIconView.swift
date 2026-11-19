@@ -6,7 +6,7 @@
 import SwiftUI
 
 /// Vector-drawn miniature vintage 35mm point-and-shoot camera icon (inspired by classic Kodak Ultra F9).
-/// Features a two-tone body (black top band + vintage leatherette lower body),
+/// Features a two-tone body (black top band + bright light-grey leatherette plate),
 /// large circular lens barrel with glass reflection, optical viewfinder window, and flash element.
 struct AnalogCameraIconView: View {
     var isSelected: Bool = false
@@ -23,14 +23,14 @@ struct AnalogCameraIconView: View {
                 .fill(Color.black.opacity(0.85))
                 .frame(width: width, height: height)
 
-            // Lower two-tone leatherette plate (Amber/Gold or Classic camera leather)
+            // Lower two-tone leatherette plate (Bright Light Grey for high contrast)
             VStack {
                 Spacer()
                 RoundedRectangle(cornerRadius: height * 0.12)
                     .fill(
                         isSelected
-                        ? Color(red: 0.95, green: 0.72, blue: 0.25)
-                        : Color(red: 0.85, green: 0.65, blue: 0.22)
+                        ? Color(white: 0.88)
+                        : Color(white: 0.75)
                     )
                     .frame(width: width, height: height * 0.58)
             }
@@ -51,7 +51,7 @@ struct AnalogCameraIconView: View {
 
                 // Flash Diffuser
                 RoundedRectangle(cornerRadius: 1)
-                    .fill(Color(white: 0.85))
+                    .fill(Color(white: 0.9))
                     .frame(width: width * 0.22, height: height * 0.22)
                     .overlay(
                         // Flash Fresnel ribs
@@ -90,7 +90,7 @@ struct AnalogCameraIconView: View {
                         .overlay(
                             // Glass anti-reflective blue-cyan coating flare
                             Circle()
-                                .strokeBorder(Color.cyan.opacity(0.6), lineWidth: 0.7)
+                                .strokeBorder(Color.cyan.opacity(0.7), lineWidth: 0.7)
                         )
                 )
                 .offset(x: width * 0.18, y: height * 0.26)
